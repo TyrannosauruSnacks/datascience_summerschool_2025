@@ -43,9 +43,9 @@ This is also to ensure the "randomness".
 > of red balls?
 
 Students did not all have the same sample proportion of red balls
-because their sample was just that, a small part of the whole bowl. So
-by pure chance (random sampling) they can get more or less red balls,
-as the proportion for the whole bowl means that there are probably
+because their sample was just a small part of all the balls in the bowl.
+So by pure chance (random sampling) they can get more or less red
+balls, as the proportion for the whole bowl means that there are probably
 more than 25 red and 25 white balls.
 
 ### 7.1.3 Virtual sampling
@@ -58,7 +58,7 @@ more than 25 red and 25 white balls.
 > virtual sample (in our case, 33 virtual samples)?
 
 Sampling variation refers to the difference between samples. It
-describes the fact that different samples from the same population can
+describes the fact that different samples from the same population
 differ in their values. And a difference always needs at least two
 points of reference.
 
@@ -68,7 +68,8 @@ points of reference.
 
 Because it is impractical and not efficient, as more balls (50k) would
 have been sampled than there are in the bowl (2400) to begin with. At
-this rate, counting all the balls in the bowl would be more sensible.
+this rate, counting each individual balls in the bowl would be more
+sensible.
 
 
 #### LC7.5
@@ -77,25 +78,25 @@ this rate, counting all the balls in the bowl would be more sensible.
 > 30% of them were red is likely or not? What about sampling 50 balls
 > where 10% of them were red?
 
-Having a sample of 50 Balls where 30% were red, seems rather likely,
+Having a sample of 50 Balls where 30% were red seems rather likely,
 as according to the histogram a reasonable amount of the samples taken
 had that proportion. The histogram also implies that having a sample
-of 50 balls with a propotion of 10% red balls is rather unlikely both
-on general and relative to a propotion of 30%.
+of 50 balls with a proportion of 10% red balls is rather unlikely both
+in general and relative to a proportion of 30%.
+
 #### LC7.6
 
 > As shown in Figure 7.12 the histograms of sample proportions are
 > somewhat bell-shaped. What can you say about the center of the
 > histograms?
 
-- A. The smaller the sample size the more concentrated the center of
-  the histogram.
-- B. *The larger the sample size the smaller the center of the
-  histogram.*
-- C. The center of each histogram seems to be about the same,
-  regardless of the sample size.
+  - A. The smaller the sample size the more concentrated the center of
+    the histogram.
+  - B. *The larger the sample size the smaller the center of the histogram.*
+  - C. The center of each histogram seems to be about the same,
+    regardless of the sample size.
 
-#### !clarity
+##### !clarity
 
 To me "smaller" or "bigger" is ambiguous to the centers width, or
 height. I would like that to be more clear.
@@ -124,8 +125,7 @@ height. I would like that to be more clear.
 > Why is it important to construct a histogram of sample means or
 > proportions in a simulation study?
 
-- A. *To visualize the distribution and assess normality or other
-  patterns*
+- A. *To visualize the distribution and assess normality or other patterns*
 - B. To increase the accuracy of the sample means
 - C. To ensure all sample means are exactly the same
 - D. To remove any outliers from the data
