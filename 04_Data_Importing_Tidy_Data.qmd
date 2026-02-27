@@ -1,0 +1,145 @@
+---
+title: "4 Data Importing and Tidy Data"
+author: "Max Hachemeister"
+format: html
+editor: visual
+---
+
+## Prerequisites
+
+```{r}
+# The "setup" makes the code chunk execute before any other, when this file is accessed again.
+
+#| label: setup
+#| include: false
+
+
+# packages don't get saved between sessions, so need to install them each time
+install.packages(c(
+  "dplyr",
+  "ggplot2",
+  "readr",
+  "tidyr",
+  "nycflights23",
+  "fivethirtyeight",
+  "markdown"
+  ))
+
+# and then open the packages
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(tidyr)
+library(nycflights23)
+library(fivethirtyeight)
+library(markdown)
+```
+
+## Introduction
+
+### !Clarity
+
+> You will see that having data stored in “tidy” format is about more than just what the everyday definition of the term “tidy” might suggest: having your data “neatly organized.” Instead, we define the term “tidy” as it’s used by data scientists who use R, outlining a set of rules by which data is saved.
+
+I'd like these sentences to be more homogenus, by using the same sentence deliminator for both. So either two colons, or two commas, or so.
+
+```{r}
+library(readxl)
+dem_score <- read_excel("data/dem_score.xlsx", 
+    sheet = "dem_score")
+View(dem_score)
+```
+
+## 4.2 Tidy Data
+
+### **LC4.1**
+
+> What are common characteristics of “tidy” data frames?
+
+-   Each Column is a Variable
+
+    -   if columns are named like "x2_height" "x2_height" "x3_height", then it's better to make another column that refers to those Xs
+
+-   Each Row is an Observation
+
+    -   this is less obvious, and I can't think of an example at the moment. Gotta go fast!
+
+-   Each field contains just one value
+
+    -   yeah, these are the entries that have values like "33C/15F" or something.
+
+### **LC4.2**
+
+> What makes “tidy” data frames useful for organizing data?
+
+It's especially readable for machines, and therefore all of the tidyverse functions work best with tidy data.
+
+### LC4.3
+
+> Take a look at the `airline_safety` data frame included in the `fivethirtyeight` data package.
+>
+> This data frame is not in “tidy” format. How would you convert this data frame to be in “tidy” format, in particular so that it has a variable `fatalities_years` indicating the incident year and a variable `count` of the fatality counts?
+
+```{r}
+airline_safety_smaller <- airline_safety |> 
+  select(airline, starts_with("fatalities"))
+airline_safety_smaller
+```
+
+Okay, we can see, that the columns have the naming xx_yy, so i can deduce that this needs to be split up.
+
+So I want to pivot longer, an put the names to `fatalities_years` and the values to `count`. An I need to do this only on the columns with `fatalities` in the name.
+
+```{r}
+airline_safety_smaller |> 
+  pivot_longer(
+    names_to = "fatalities_years",
+    values_to = "count",
+    cols = starts_with("fatalities")
+  )
+```
+
+Now the values for `fatalities_years` are a bit ugly still, but that's not the task right now.
+
+## 4.3 Case study: democracy in Guatemala
+
+### !clarity
+
+I think introducing the `names_transform` argument, which only works with the `list` function is confusing. Yeah it's the elegant way, but this can also be achieved with tools we've already learned and `mutate` is also just one line of code. Ah yeah, doing this with mutate is also a new concept, we haven't really talked about converting column types very much.
+
+### **LC4.4**
+
+> Convert the `dem_score` data frame into a “tidy” data frame and assign the name of `dem_score_tidy` to the resulting long-formatted data frame.
+
+```{r}
+dem_score |> 
+  pivot_longer(
+    names_to = "year",
+    values_to = "democracy_score",
+    cols = -country,
+    names_transform = list(year = as.integer)
+  )
+```
+
+### **LC4.5**
+
+> Read in the life expectancy data stored at <https://moderndive.com/data/le_mess.csv> and convert it to a “tidy” data frame.
+
+```{r}
+# import data
+le_mess <- 
+read_csv("https://moderndive.com/data/le_mess.csv")
+
+# convert to tidy
+le_mess_tidy <- 
+le_mess |> 
+  pivot_longer(
+    names_to = "year",
+    values_to = "life_expectancy",
+    cols = -country,
+    names_transform = list(year = as.integer)
+  )
+le_mess_tidy
+```
+
+## 4.4 Tidyverse Package
