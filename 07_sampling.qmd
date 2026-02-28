@@ -131,3 +131,32 @@ height. I would like that to be more clear.
 - D. To remove any outliers from the data
 
 ## 7.2 Sampling framework
+
+#### !error 
+
+The sampling distribution of the sample proportion is the distribution of sample proportions from each possible random **sample[s]** of a given size.
+
+### LC7.10
+
+> In the case of our bowl activity, what is the *population parameter*?
+> Do we know its value?
+> How can we know its value exactly?
+
+The *population parameter* of the bowl activity is the proportion of
+red balls in the bowl ($p$). In the given case we know the value because
+the proportion was decided upon and set up by the experiment designers.
+Its value is 0.375. However, if we did not know that initially, we could
+only come to know it by observing each and every single ball in the bowl,
+which would not be a simple random sample anymore as we've done it so far.
+
+### LC7.11
+
+> How did we ensure that the samples collected with the shovel were 
+> random?
+
+I think we probably shook the bowl after putting the sampled ball back
+in. Let's check back...
+Yes, we returned the sampled balls and then mixed the whole bowl to
+mitigate the returned samples influencing the next one.
+
+### 7.3 The Central Limit Theorem
