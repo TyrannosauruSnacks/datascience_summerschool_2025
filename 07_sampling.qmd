@@ -232,3 +232,32 @@ footnote. At least if it doesn't show up again in later parts.
 [Video about Central Limit Theorem](https://youtu.be/jvoxEYmQHNM?si=jdMeRBDC-xVsbNli)
 
 ## 7.4 Second Activity: Chocolate-Covered Almonds
+
+### LC7.15
+
+> How does increasing the sample size affect the standard error of the
+> sample mean?
+
+  * A. It increases the standard error.
+  * *B. It decreases the standard error.*
+  * C. It has no effect on the standard error.
+  * D. It only affects the standard deviation.
+
+### LC7.16
+
+> For each of the following cases, explain whether the sampling distribution
+> of the sample mean approximates a normal distribution.
+>
+>   * When the population distribution is normal.
+>   * When the sample size is very large.
+>   * When the sample size is sufficiently large, regardless of the population
+>     distribution.
+>   * When the population distribution is uniform.
+
+
+Actually, it is in all the above cases that the sampling distribution of the
+sample mean approximates the the normal distribution. When the population
+distribution is normal, then any sized sample will reflect that. If the
+population distribution is not normal (e. g. uniform), the sampling mean will
+still be distributed normally as long the sample size is sufficiently up to
+very large.
