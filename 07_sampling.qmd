@@ -55,7 +55,7 @@ more than 25 red and 25 white balls.
 
 > Why couldn’t we study the effects of sampling variation when we used
 > the virtual shovel only once? Why did we need to take more than one
-> virtual sample (in our case, 33 virtual samples)?
+> virtual sample (in our case, 33 virtual  samples)?
 
 Sampling variation refers to the difference between samples. It
 describes the fact that different samples from the same population
@@ -132,7 +132,7 @@ height. I would like that to be more clear.
 
 ## 7.2 Sampling framework
 
-#### !error 
+##### !error 
 
 The sampling distribution of the sample proportion is the distribution of sample proportions from each possible random **sample[s]** of a given size.
 
@@ -160,3 +160,75 @@ Yes, we returned the sampled balls and then mixed the whole bowl to
 mitigate the returned samples influencing the next one.
 
 ### 7.3 The Central Limit Theorem
+
+##### !error
+7.3.2  ones and zeros, for X1,*[$]X_2, …, X25* and finding their average.
+
+Moreover, while any given trial can result in choosing a red ball or not (1 or 0), the chances*[or] getting* a red ball are influenced by the proportion of red balls in the bowl. 
+
+#### 7.3.2
+I had a hard time grasping this section, and hope this will clear up in the 
+following sections. Or maybe I should read it again. 
+Well I guess it would be nice to know the actual intention of this section.
+This is not clear to me.
+
+### LC7.12
+
+> What is th expected value of the sample mean in the context of sampling
+> distributions?
+
+  * A. The observed value of the sample mean
+  * B. The population mean
+  * C. *The median of the sample distribution*
+  * D. The midpoint of the range
+  
+It is not the observed value of the sample mean, as the sample mean refers to
+just a single mean of one of all the samples. It can also not be the population
+mean, as this can only be observed by sampling the whole population, if that
+were even possible. It is not the midpoint of the range, as the range (the
+min and max) can be offset to the median (the geometric mean) of the sample.
+So it should be the median, as it expresses the value of a distribution that
+splits the observations in two equal sums.
+
+#### 7.3.4
+
+##### !clarity
+The alternative expression for the standard deviation of sample proportions
+is confusing at this point because I would now like to know why that is. I
+mean yeah, it is probably right to note that, but hmm... maybe just as a 
+footnote. At least if it doesn't show up again in later parts.
+
+### LC7.13
+
+> What is the role of the Central Limit Theorem (CLT) in statistical
+> inference?
+
+  * A. It provides the formula for calculating the standard deviation of
+  any given sample, allowing for an understanding of the sample's spread
+  or variability.
+  
+  * *B. It states that the sampling distribution of the sample mean will*
+  *approach a normal distribution, regardless of the population's*
+  *distribution, as the sample size becomes large.*
+  
+  * C. It determines the actual mean of the population directly by 
+  calculating it from a randomly selected sample, without needing
+  additional data or assumptions.
+  
+  * D. It is a principle that applies strictly and exclusively to
+  populations that are normally distributed, ensuring that only in such
+  cases the sample means will follow a normal distribution pattern.
+  
+### LC7.14
+
+> What does the term "sampling variation" refer to?
+
+  * A. Variability in the population data.
+  * *B. Differences in sample statistics due to random sampling.*
+  * C. Changes in the population parameter over time.
+  * D. Variation caused by errors in data collection.
+  
+### TODO - Check this video next time
+[Video about Central Limit Theorem](https://youtu.be/jvoxEYmQHNM?si=jdMeRBDC-xVsbNli)
+
+## 7.4 Second Activity: Chocolate-Covered Almonds
