@@ -16,11 +16,11 @@ editor: visual
 #| include: false
 
 # packages don't get saved between sessions, so need to install them each time
-install.packages(c(
-  "tidyverse",
-  "moderndive",
-  "markdown"
-  ))
+## install.packages(c(
+##   "tidyverse",
+##   "moderndive",
+##   "markdown"
+##   ))
 
 # and then open the packages
 library(tidyverse)
@@ -39,21 +39,21 @@ Please explain why we also take `obesity_rate_2016` in the filtered dataframe?
 Get raw data and select columns of interest
 
 ```{r}
-UN_data_ch5 <- 
-  un_member_states_2024 |> 
+UN_data_ch5 <-
+  un_member_states_2024 |>
   select(
     iso,
     life_exp = life_expectancy_2022,
     fert_rate = fertility_rate_2022,
     obes_rate = obesity_rate_2016
-  ) |> 
+  ) |>
   na.omit()
 ```
 
 Take a random sample to get an intuition about the data.
 
 ```{r}
-UN_data_ch5 |> 
+UN_data_ch5 |>
   slice_sample(n = 5)
 ```
 
@@ -62,13 +62,13 @@ Get a statistical summary of the data.
 Here we just take the two main variables, as `iso` being type character isn't sensibly summarized by standard numeric functions and `obes_rate` is not of interest at the moment.
 
 ```{r}
-UN_data_ch5 |> 
+UN_data_ch5 |>
   # I'm using the numbers of the columns here, because I'm to lazy to type them out
-  select(2, 3) |> 
+  select(2, 3) |>
   tidy_summary()
-  
+
 ## this should also work directly inside the tidy_summary() function
-UN_data_ch5 |> 
+UN_data_ch5 |>
   tidy_summary(columns = c(2,3))
 ```
 
@@ -76,18 +76,18 @@ Get the correlation (coefficient) for the two variables.
 
 ```{r}
 # this can either be done via the cor() function within summarize()
-UN_data_ch5 |> 
+UN_data_ch5 |>
   summarize(correlation = cor(fert_rate, life_exp))
 
 # aswell as with the get_correlation() function from moderndive
-UN_data_ch5 |> 
+UN_data_ch5 |>
   get_correlation(fert_rate ~ life_exp)
 ```
 
 Make a scatter plot for the two variables.
 
 ```{r}
-UN_data_ch5 |> 
+UN_data_ch5 |>
   ggplot(aes(life_exp, fert_rate)) +
   geom_point(alpha = .1) +
   labs(x = "Life Expectancy", y = "Fertility Rate")
@@ -124,11 +124,11 @@ Look at the raw data values:
 
 ```{r}
 # check out the data
-UN_data_ch5 |> 
+UN_data_ch5 |>
   view()
 
 # take a random sample
-UN_data_ch5 |> 
+UN_data_ch5 |>
   slice_sample(n = 5)
 ```
 
@@ -136,16 +136,16 @@ Compute summary statistics:
 
 ```{r}
 # univariate statistical summary
-UN_data_ch5 |> 
+UN_data_ch5 |>
   tidy_summary(columns = c(fert_rate, obes_rate))
 
 # bivariate statistic, correlation coefficient
 ## version 1
-UN_data_ch5 |> 
+UN_data_ch5 |>
   summarize(correlation_coefficient = cor(fert_rate, obes_rate))
 
 ## version 2
-UN_data_ch5 |> 
+UN_data_ch5 |>
   get_correlation(formula = fert_rate ~ obes_rate)
 ```
 
@@ -157,7 +157,7 @@ Visualize the data:
 
 ```{r}
 # make a scatterplot and fit a linear regression line
-UN_data_ch5 |> 
+UN_data_ch5 |>
   ggplot(aes(x = obes_rate, y = fert_rate)) +
   geom_point(alpha = .1) +
   geom_smooth(method = "lm",
@@ -201,7 +201,7 @@ Fit a model and get the regression coefficient:
 
 ```{r}
 # fit the model and save it to an object
-demographics_model <- 
+demographics_model <-
   lm(fert_rate ~ life_exp, data = UN_data_ch5)
 
 # get the coefficient
@@ -216,7 +216,7 @@ Fit a linear model and get the regression coefficients:
 
 ```{r}
 # fit the linear model
-lm_fert_obes <- 
+lm_fert_obes <-
   lm(fert_rate ~ obes_rate, data = UN_data_ch5)
 
 # get the coefficient
@@ -334,12 +334,12 @@ I'm having a hard time understanding this sentence:
 Create a data frame with columns of interest and without incomplete observations:
 
 ```{r}
-gapminder2022 <- 
-  un_member_states_2024 |> 
+gapminder2022 <-
+  un_member_states_2024 |>
   select(country,
          life_exp = life_expectancy_2022,
          continent,
-         gdp_per_capita) |> 
+         gdp_per_capita) |>
   na.omit()
 ```
 
@@ -348,7 +348,7 @@ Get a first overview of the data:
 ```{r}
 glimpse(gapminder2022)
 
-gapminder2022 |> 
+gapminder2022 |>
   slice_sample(n = 5)
 ```
 
@@ -359,7 +359,7 @@ here another function for slicing samples is used `sample_n()`, which has bee su
 Get some univariate summary statistics:
 
 ```{r}
-gapminder2022 |> 
+gapminder2022 |>
   tidy_summary(columns = c(life_exp, continent))
 ```
 
@@ -372,7 +372,7 @@ Same for the mean.
 Visualize the the distribution of `life_exp`:
 
 ```{r}
-gapminder2022 |> 
+gapminder2022 |>
   ggplot(aes(life_exp)) +
   geom_histogram(binwidth = 5, color = "grey76") +
   labs(title = "Histrogram of distribution of worldwide life expectancies",
@@ -383,7 +383,7 @@ gapminder2022 |>
 Show Histogram for each continent.
 
 ```{r}
-gapminder2022 |> 
+gapminder2022 |>
   ggplot(aes(life_exp)) +
   geom_histogram(binwidth = 5, color = "grey76") +
   # change title accordingly
@@ -397,7 +397,7 @@ gapminder2022 |>
 Make a side-by-side boxplot per continent:
 
 ```{r}
-gapminder2022 |> 
+gapminder2022 |>
   ggplot(aes(continent, life_exp)) +
   geom_boxplot() +
   labs(title = "Distribution life expectancies by continent",
@@ -410,9 +410,9 @@ gapminder2022 |>
 Now get the mean and median life expectancy for each per continent:
 
 ```{r}
-life_exp_by_continent <- 
-gapminder2022 |> 
-  group_by(continent) |> 
+life_exp_by_continent <-
+gapminder2022 |>
+  group_by(continent) |>
   summarize(median = round(median(life_exp), 1),
             mean = round(mean(life_exp), 1))
 
@@ -428,9 +428,9 @@ Also the rounding function is not given in the code of the book.
 Get the difference of mean life expectancy for each continent to the lowest mean life expectancy:
 
 ```{r}
-life_exp_by_continent |> 
+life_exp_by_continent |>
   select(continent,
-         mean) |> 
+         mean) |>
   mutate("Difference versus Africa" = mean - min(mean))
 ```
 
@@ -457,22 +457,22 @@ Steps of EDA:
 Select data/columns of interest and look at the raw data:
 
 ```{r}
-gdp_worldwide <- 
-gapminder2022 |> 
+gdp_worldwide <-
+gapminder2022 |>
   select(-life_exp)
 
-gdp_worldwide |> 
-  glimpse() 
+gdp_worldwide |>
+  glimpse()
 
-gdp_worldwide |>  
+gdp_worldwide |>
   slice_sample(n = 5)
-  
+
 ```
 
 Get univariate statistics:
 
 ```{r}
-gdp_worldwide |> 
+gdp_worldwide |>
   tidy_summary(columns = c(gdp_per_capita, continent))
 ```
 
@@ -483,7 +483,7 @@ Visualize Distributions
 Make a Histogram
 
 ```{r}
-gdp_worldwide |> 
+gdp_worldwide |>
 ggplot(aes(gdp_per_capita)) +
   geom_histogram(binwidth = 1e4, color = "grey76") +
   labs(title = "Histogram of distribution of wordwide GPDs per capita",
@@ -496,7 +496,7 @@ With the distribution being very wide, the countries with GDP per capita below t
 Make a histogram for each continent:
 
 ```{r}
-gdp_worldwide |> 
+gdp_worldwide |>
 ggplot(aes(gdp_per_capita)) +
   geom_histogram(binwidth = 1e4, color = "grey76") +
   labs(title = "Histogram of distribution of GPDs per capita per continent",
@@ -510,7 +510,7 @@ The distribution of the lower GDP per capita is still unclear due to the outlier
 Make a side-by-side barplot:
 
 ```{r}
-gdp_worldwide |> 
+gdp_worldwide |>
   ggplot(aes(continent, gdp_per_capita)) +
   geom_boxplot() +
   labs(title = "Distribution of GDP per capita",
@@ -523,11 +523,11 @@ Okay, with such a wide distribution it's hard to get the different groups into p
 Let's also compute the mean for each continent an add the column with the relative difference to the lowest mean.
 
 ```{r}
-gdp_worldwide_diff_mean <- 
-  gdp_worldwide |> 
-    group_by(continent) |> 
+gdp_worldwide_diff_mean <-
+  gdp_worldwide |>
+    group_by(continent) |>
     summarize(median = median(gdp_per_capita),
-              mean = mean(gdp_per_capita)) |> 
+              mean = mean(gdp_per_capita)) |>
     mutate("Difference of mean to minimal mean" = mean - min(mean))
 
 gdp_worldwide_diff_mean
@@ -554,7 +554,7 @@ I'm confused about "variable in regression", when so far we've just been computi
 Fit a linear regression model and get the coefficients
 
 ```{r}
-lm_life_continent <- 
+lm_life_continent <-
   lm(life_exp ~ continent, data = gapminder2022)
 
 coef(lm_life_continent)
@@ -579,11 +579,11 @@ Amer does not refer to Asia. This is also like that in the corresponding mathjax
 Fit a linear regression:
 
 ```{r}
-lm_gdp_continent <- 
+lm_gdp_continent <-
   lm(gdp_per_capita ~ continent, data = gapminder2022)
 
 coef(lm_gdp_continent)
-  
+
 ```
 
 This model represents the data as we've computed in LC5.11.
@@ -656,7 +656,7 @@ Identify the countries with the five smallest (most negative) residuals:
 
 ```{r}
 get_regression_points(lm_life_continent,
-                      ID = "country") |> 
+                      ID = "country") |>
   slice_min(residual, n = 5)
 ```
 
@@ -669,8 +669,8 @@ The negative residuals of these countries represents how much their life expecta
 Get the countries with the highest residuals in life expectancy:
 
 ```{r}
-lm_life_continent |> 
-  get_regression_points(ID = "country") |> 
+lm_life_continent |>
+  get_regression_points(ID = "country") |>
   slice_max(residual, n = 5)
 ```
 
@@ -691,11 +691,11 @@ Isn't the HDI more a parameter or principal component than a measurable variable
 Compute the sum of least squares for the regression model of fertility rate explained by life expectancy1:
 
 ```{r}
-demographics_model |> 
-  get_regression_points() |> 
-  mutate(residual_squared = residual^2) |> 
+demographics_model |>
+  get_regression_points() |>
+  mutate(residual_squared = residual^2) |>
   summarize(sum_squared_residuals = sum(residual_squared))
-  
+
 ```
 
 **LC5.19**
@@ -714,7 +714,7 @@ demographics_model |>
 
 ```{r}
 # create tibble with values
-line_points <- 
+line_points <-
   tribble(
     ~line, ~point, ~residual,
     "red", 1, -.5,
@@ -729,8 +729,8 @@ line_points <-
   )
 
 # calculate sum of squared residuals
-line_points |> 
-  group_by(line) |> 
+line_points |>
+  group_by(line) |>
   summarize(sum_squared_residuals = sum(residual^2))
 ```
 
@@ -743,11 +743,11 @@ Check out the `augment()` and `clean_names()` function.
 ```{r}
 library(broom)
 library(janitor)
-demographics_model |> 
+demographics_model |>
   # augment adds the model calculations to the corresponding dataframe
-  augment() |> 
+  augment() |>
   # mutate_if rounds the values of all numeric columns to two digits
-  mutate_if(is.numeric, round, digits = 2) |> 
+  mutate_if(is.numeric, round, digits = 2) |>
   # clean names takes away the prefix signs and converts to snake case
   clean_names()
 ```

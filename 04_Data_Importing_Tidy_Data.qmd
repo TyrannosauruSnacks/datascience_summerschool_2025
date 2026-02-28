@@ -15,15 +15,15 @@ editor: visual
 
 
 # packages don't get saved between sessions, so need to install them each time
-install.packages(c(
-  "dplyr",
-  "ggplot2",
-  "readr",
-  "tidyr",
-  "nycflights23",
-  "fivethirtyeight",
-  "markdown"
-  ))
+## install.packages(c(
+##   "dplyr",
+##   "ggplot2",
+##   "readr",
+##   "tidyr",
+##   "nycflights23",
+##   "fivethirtyeight",
+##   "markdown"
+##   ))
 
 # and then open the packages
 library(dplyr)
@@ -45,7 +45,7 @@ I'd like these sentences to be more homogenus, by using the same sentence delimi
 
 ```{r}
 library(readxl)
-dem_score <- read_excel("data/dem_score.xlsx", 
+dem_score <- read_excel("data/dem_score.xlsx",
     sheet = "dem_score")
 View(dem_score)
 ```
@@ -81,7 +81,7 @@ It's especially readable for machines, and therefore all of the tidyverse functi
 > This data frame is not in “tidy” format. How would you convert this data frame to be in “tidy” format, in particular so that it has a variable `fatalities_years` indicating the incident year and a variable `count` of the fatality counts?
 
 ```{r}
-airline_safety_smaller <- airline_safety |> 
+airline_safety_smaller <- airline_safety |>
   select(airline, starts_with("fatalities"))
 airline_safety_smaller
 ```
@@ -91,7 +91,7 @@ Okay, we can see, that the columns have the naming xx_yy, so i can deduce that t
 So I want to pivot longer, an put the names to `fatalities_years` and the values to `count`. An I need to do this only on the columns with `fatalities` in the name.
 
 ```{r}
-airline_safety_smaller |> 
+airline_safety_smaller |>
   pivot_longer(
     names_to = "fatalities_years",
     values_to = "count",
@@ -112,7 +112,7 @@ I think introducing the `names_transform` argument, which only works with the `l
 > Convert the `dem_score` data frame into a “tidy” data frame and assign the name of `dem_score_tidy` to the resulting long-formatted data frame.
 
 ```{r}
-dem_score |> 
+dem_score |>
   pivot_longer(
     names_to = "year",
     values_to = "democracy_score",
@@ -127,12 +127,12 @@ dem_score |>
 
 ```{r}
 # import data
-le_mess <- 
+le_mess <-
 read_csv("https://moderndive.com/data/le_mess.csv")
 
 # convert to tidy
-le_mess_tidy <- 
-le_mess |> 
+le_mess_tidy <-
+le_mess |>
   pivot_longer(
     names_to = "year",
     values_to = "life_expectancy",
