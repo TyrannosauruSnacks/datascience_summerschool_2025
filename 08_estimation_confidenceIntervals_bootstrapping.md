@@ -59,3 +59,47 @@ theme_set(theme_light())
 
 - D. A point estimate and an interval estimate are the same and can be
   used interchangeably.
+
+##### !error
+
+8.1.2 within 2 standard deviations *form* the mean is 95.45%
+
+#### LC8.3
+
+> What does the population mean ($\mu$) represend in the context of the
+> almond activity?
+
+- A. The average weight of 100 randomly sampled almonds.
+- B. The weight of the heaviest almond in the bowl.
+- *C. The average weight of all 5,000 almonds in the bowl.*
+- D. The total weight of all almonds in the bowl.
+
+#### LC8.4
+
+> Which of the following statements best describes the population
+> standard deviation ($\sigma$) in the almond activity?
+
+- A. It measures the average difference between each almond’s weight and
+  the sample mean weight.
+
+- *B. It measures the average difference between each almond’s* *weight
+  and the population mean weight.*
+
+- C. It is equal to the square root of the sample variance.
+
+- D. It is always smaller than the population mean.
+
+#### LC8.4
+
+> Why do we use the sample mean to estimate the population mean in the
+> almond activity?
+
+- A. Because the sample mean is always larger than the population mean.
+
+- *B. Because the sample mean is a good estimator of the population*
+  *mean due to its unbiasedness.*
+
+- C. Because the sample mean requires less computational effort than the
+  population mean.
+
+- D. Because the sample mean eliminates all sampling variation.
