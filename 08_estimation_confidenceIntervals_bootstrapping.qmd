@@ -1,0 +1,54 @@
+---
+title:       "Estimation, Confidence Intervals, and Bootstrapping"
+subtitle:    "My Personal Notes"
+author:      "Max Hachemeister"
+date:        last-modified
+date-format: iso
+format:
+  gfm:
+    toc:     true
+---
+
+# Prerequisites
+
+```{r}
+#| label: setup
+#| results: false
+
+library(tidyverse)
+library(moderndive)
+library(infer)
+theme_set(theme_light())
+```
+
+## Tying the Sampling Distribution to Estimation
+
+#### LC8.1
+
+> What is the expected value of the sample mean weight of almonds in a
+> large sample according to the sampling distribution theory?
+
+  * A. It is always larger than the population mean.
+  * B. It is always smaller than the population mean.
+  * C. It is exactly equal to the population mean.
+  * *D. It is equal to the population mean on average but may vary*
+       *in a single sample.*
+       
+#### LC8.2
+
+> What is a *point estimate* and how does it doffer from an *interval*
+> *estimate* in the context of statistical estimation?
+
+  * A. A point estimate uses multiple values to estimate a parameter;
+       an interval estimate uses a single value.
+       
+  * *B. A point estimate is a single value used to estimate a parameter;*
+       *an interval estimate provides a range of values within which the*
+       *parameter likely fails.*
+       
+  * C. A point estimate is the mean of multiple samples; an interval
+       estimate is the median.
+       
+  * D. A point estimate and an interval estimate are the same and can
+       be used interchangeably.
+       

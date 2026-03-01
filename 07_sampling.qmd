@@ -1,7 +1,9 @@
 ---
 title: "7 Sampling"
 author: "Max Hachemeister"
-format: html
+format: 
+  gfm:
+    toc: true
 editor: source
 ---
 
@@ -98,7 +100,7 @@ in general and relative to a proportion of 30%.
 
 ##### !clarity
 
-To me "smaller" or "bigger" is ambiguous to the centers width, or
+To me, "smaller" or "bigger" is ambiguous to the centers width, or
 height. I would like that to be more clear.
 
 #### LC7.7
@@ -256,8 +258,41 @@ footnote. At least if it doesn't show up again in later parts.
 
 
 Actually, it is in all the above cases that the sampling distribution of the
-sample mean approximates the the normal distribution. When the population
+sample mean approximates the normal distribution. When the population
 distribution is normal, then any sized sample will reflect that. If the
 population distribution is not normal (e. g. uniform), the sampling mean will
 still be distributed normally as long the sample size is sufficiently up to
 very large.
+
+## 7.5 The Sampling Distribution in Other Scenarios
+
+##### !clarity
+
+Hold up, where did that $\overline Y$ in the expression come from? I expected it to be $\overline X_1 - \overline X_2$
+
+#### LC7.17
+
+> In the context of comparing two samples, why do we add variances (squared
+> standard deviations) instead of substracting them when findinf the standard
+> error of the difference?
+
+  * A. Because variances always cancel each other out.
+  * B. *Because adding variances reflects to total uncertainty from both*
+       *samples.*
+  * C. Because subtracting varinaces always gives negative results.
+  * D. Because variances are not related to the standard error.
+
+##### !error
+
+7.5.1
+The proportion of red *balls[] the population* proportion and standard deviation are given by p1 and σ1=√p1(1−p1) and for the almonds’ weight the population proportion and standard deviation are given by p2 and σ2=√p2(1−p2).
+
+#### LC7.17
+
+> What is the sampling distribution of the difference in sample propotions
+> expected to look like if both samples are large enough?
+
+  * A. Uniform
+  * *B. Bell-shaped, approximating a normal distribution*
+  * C. Bimodal.
+  * D. Skewed to the right.

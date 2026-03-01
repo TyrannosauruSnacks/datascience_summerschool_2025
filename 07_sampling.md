@@ -1,0 +1,341 @@
+# 7 Sampling
+Max Hachemeister
+
+- [Prerequisites](#prerequisites)
+- [7 Sampling](#7-sampling)
+  - [7.1 First activity: red balls](#71-first-activity-red-balls)
+    - [7.1.2 Manual sampling](#712-manual-sampling)
+    - [7.1.3 Virtual sampling](#713-virtual-sampling)
+  - [7.2 Sampling framework](#72-sampling-framework)
+    - [LC7.10](#lc710)
+    - [LC7.11](#lc711)
+    - [7.3 The Central Limit Theorem](#73-the-central-limit-theorem)
+    - [LC7.12](#lc712)
+    - [LC7.13](#lc713)
+    - [LC7.14](#lc714)
+    - [TODO - Check this video next
+      time](#todo---check-this-video-next-time)
+  - [7.4 Second Activity: Chocolate-Covered
+    Almonds](#74-second-activity-chocolate-covered-almonds)
+    - [LC7.15](#lc715)
+    - [LC7.16](#lc716)
+  - [7.5 The Sampling Distribution in Other
+    Scenarios](#75-the-sampling-distribution-in-other-scenarios)
+
+# Prerequisites
+
+``` r
+# The "setup" makes the code chunk execute before any other, when this file is
+# accessed again.
+
+#| label: setup
+#| include: false
+
+
+library(tidyverse)
+```
+
+    ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ✔ dplyr     1.1.4     ✔ readr     2.1.6
+    ✔ forcats   1.0.1     ✔ stringr   1.6.0
+    ✔ ggplot2   4.0.1     ✔ tibble    3.3.1
+    ✔ lubridate 1.9.4     ✔ tidyr     1.3.2
+    ✔ purrr     1.2.0     
+    ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ✖ dplyr::filter() masks stats::filter()
+    ✖ dplyr::lag()    masks stats::lag()
+    ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
+library(moderndive)
+library(infer)
+#library(markdown)
+```
+
+# 7 Sampling
+
+## 7.1 First activity: red balls
+
+### 7.1.2 Manual sampling
+
+#### LC7.1
+
+> Why is it important to mix the balls in the bowl before we take a new
+> sample?
+
+It is important that the bowl is mixed between samples to ensure the
+samples are independent of one another; that is, one sample shouldn’t
+systematically get the same balls because they weren’t mixed well. This
+is also to ensure the “randomness”.
+
+#### LC7.2
+
+> Why is it that students did not all have the same sample proportion of
+> red balls?
+
+Students did not all have the same sample proportion of red balls
+because their sample was just a small part of all the balls in the bowl.
+So by pure chance (random sampling) they can get more or less red balls,
+as the proportion for the whole bowl means that there are probably more
+than 25 red and 25 white balls.
+
+### 7.1.3 Virtual sampling
+
+#### LC7.3
+
+> Why couldn’t we study the effects of sampling variation when we used
+> the virtual shovel only once? Why did we need to take more than one
+> virtual sample (in our case, 33 virtual samples)?
+
+Sampling variation refers to the difference between samples. It
+describes the fact that different samples from the same population
+differ in their values. And a difference always needs at least two
+points of reference.
+
+#### LC7.4
+
+> Why did we not take 1000 samples of 50 balls by hand?
+
+Because it is impractical and not efficient, as more balls (50k) would
+have been sampled than there are in the bowl (2400) to begin with. At
+this rate, counting each individual balls in the bowl would be more
+sensible.
+
+#### LC7.5
+
+> Looking at Figure 7.10, would you say that sampling 50 balls where 30%
+> of them were red is likely or not? What about sampling 50 balls where
+> 10% of them were red?
+
+Having a sample of 50 Balls where 30% were red seems rather likely, as
+according to the histogram a reasonable amount of the samples taken had
+that proportion. The histogram also implies that having a sample of 50
+balls with a proportion of 10% red balls is rather unlikely both in
+general and relative to a proportion of 30%.
+
+#### LC7.6
+
+> As shown in Figure 7.12 the histograms of sample proportions are
+> somewhat bell-shaped. What can you say about the center of the
+> histograms?
+
+- A. The smaller the sample size the more concentrated the center of the
+  histogram.
+- B. *The larger the sample size the smaller the center of the
+  histogram.*
+- C. The center of each histogram seems to be about the same, regardless
+  of the sample size.
+
+##### !clarity
+
+To me, “smaller” or “bigger” is ambiguous to the centers width, or
+height. I would like that to be more clear.
+
+#### LC7.7
+
+> As shown in Figure 7.12 as the sample size increases, the histogram
+> gets narrower. What happens with the sample proportions?
+
+- A. *They vary less.*
+- B. They vary by the same amount.
+- C. They vary more.
+
+#### LC7.8
+
+> Why do we use random sampling when constructing sampling
+> distributions?
+
+- A. To always get the same sample
+- B. *To minimize bias and make inferences about the population*
+- C. To make the process easier
+- D. To reduce the number of samples needed
+
+#### LC7.9
+
+> Why is it important to construct a histogram of sample means or
+> proportions in a simulation study?
+
+- A. *To visualize the distribution and assess normality or other
+  patterns*
+- B. To increase the accuracy of the sample means
+- C. To ensure all sample means are exactly the same
+- D. To remove any outliers from the data
+
+## 7.2 Sampling framework
+
+##### !error
+
+The sampling distribution of the sample proportion is the distribution
+of sample proportions from each possible random **sample\[s\]** of a
+given size.
+
+### LC7.10
+
+> In the case of our bowl activity, what is the *population parameter*?
+> Do we know its value? How can we know its value exactly?
+
+The *population parameter* of the bowl activity is the proportion of red
+balls in the bowl ($p$). In the given case we know the value because the
+proportion was decided upon and set up by the experiment designers. Its
+value is 0.375. However, if we did not know that initially, we could
+only come to know it by observing each and every single ball in the
+bowl, which would not be a simple random sample anymore as we’ve done it
+so far.
+
+### LC7.11
+
+> How did we ensure that the samples collected with the shovel were
+> random?
+
+I think we probably shook the bowl after putting the sampled ball back
+in. Let’s check back… Yes, we returned the sampled balls and then mixed
+the whole bowl to mitigate the returned samples influencing the next
+one.
+
+### 7.3 The Central Limit Theorem
+
+##### !error
+
+7.3.2 ones and zeros, for X1,*\[\$\]X_2, …, X25* and finding their
+average.
+
+Moreover, while any given trial can result in choosing a red ball or not
+(1 or 0), the chances*\[or\] getting* a red ball are influenced by the
+proportion of red balls in the bowl.
+
+#### 7.3.2
+
+I had a hard time grasping this section, and hope this will clear up in
+the following sections. Or maybe I should read it again. Well I guess it
+would be nice to know the actual intention of this section. This is not
+clear to me.
+
+### LC7.12
+
+> What is th expected value of the sample mean in the context of
+> sampling distributions?
+
+- A. The observed value of the sample mean
+- B. The population mean
+- C. *The median of the sample distribution*
+- D. The midpoint of the range
+
+It is not the observed value of the sample mean, as the sample mean
+refers to just a single mean of one of all the samples. It can also not
+be the population mean, as this can only be observed by sampling the
+whole population, if that were even possible. It is not the midpoint of
+the range, as the range (the min and max) can be offset to the median
+(the geometric mean) of the sample. So it should be the median, as it
+expresses the value of a distribution that splits the observations in
+two equal sums.
+
+#### 7.3.4
+
+##### !clarity
+
+The alternative expression for the standard deviation of sample
+proportions is confusing at this point because I would now like to know
+why that is. I mean yeah, it is probably right to note that, but hmm…
+maybe just as a footnote. At least if it doesn’t show up again in later
+parts.
+
+### LC7.13
+
+> What is the role of the Central Limit Theorem (CLT) in statistical
+> inference?
+
+- A. It provides the formula for calculating the standard deviation of
+  any given sample, allowing for an understanding of the sample’s spread
+  or variability.
+
+- *B. It states that the sampling distribution of the sample mean will*
+  *approach a normal distribution, regardless of the population’s*
+  *distribution, as the sample size becomes large.*
+
+- C. It determines the actual mean of the population directly by
+  calculating it from a randomly selected sample, without needing
+  additional data or assumptions.
+
+- D. It is a principle that applies strictly and exclusively to
+  populations that are normally distributed, ensuring that only in such
+  cases the sample means will follow a normal distribution pattern.
+
+### LC7.14
+
+> What does the term “sampling variation” refer to?
+
+- A. Variability in the population data.
+- *B. Differences in sample statistics due to random sampling.*
+- C. Changes in the population parameter over time.
+- D. Variation caused by errors in data collection.
+
+### TODO - Check this video next time
+
+[Video about Central Limit
+Theorem](https://youtu.be/jvoxEYmQHNM?si=jdMeRBDC-xVsbNli)
+
+## 7.4 Second Activity: Chocolate-Covered Almonds
+
+### LC7.15
+
+> How does increasing the sample size affect the standard error of the
+> sample mean?
+
+- A. It increases the standard error.
+- *B. It decreases the standard error.*
+- C. It has no effect on the standard error.
+- D. It only affects the standard deviation.
+
+### LC7.16
+
+> For each of the following cases, explain whether the sampling
+> distribution of the sample mean approximates a normal distribution.
+>
+> - When the population distribution is normal.
+> - When the sample size is very large.
+> - When the sample size is sufficiently large, regardless of the
+>   population distribution.
+> - When the population distribution is uniform.
+
+Actually, it is in all the above cases that the sampling distribution of
+the sample mean approximates the normal distribution. When the
+population distribution is normal, then any sized sample will reflect
+that. If the population distribution is not normal (e. g. uniform), the
+sampling mean will still be distributed normally as long the sample size
+is sufficiently up to very large.
+
+## 7.5 The Sampling Distribution in Other Scenarios
+
+##### !clarity
+
+Hold up, where did that $\overline Y$ in the expression come from? I
+expected it to be $\overline X_1 - \overline X_2$
+
+#### LC7.17
+
+> In the context of comparing two samples, why do we add variances
+> (squared standard deviations) instead of substracting them when
+> findinf the standard error of the difference?
+
+- A. Because variances always cancel each other out.
+- B. *Because adding variances reflects to total uncertainty from both*
+  *samples.*
+- C. Because subtracting varinaces always gives negative results.
+- D. Because variances are not related to the standard error.
+
+##### !error
+
+7.5.1 The proportion of red *balls\[\] the population* proportion and
+standard deviation are given by p1 and σ1=√p1(1−p1) and for the almonds’
+weight the population proportion and standard deviation are given by p2
+and σ2=√p2(1−p2).
+
+#### LC7.17
+
+> What is the sampling distribution of the difference in sample
+> propotions expected to look like if both samples are large enough?
+
+- A. Uniform
+- *B. Bell-shaped, approximating a normal distribution*
+- C. Bimodal.
+- D. Skewed to the right.
