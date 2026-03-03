@@ -5,7 +5,6 @@ Max Hachemeister
 - [Prerequisites](#prerequisites)
   - [Tying the Sampling Distribution to
     Estimation](#tying-the-sampling-distribution-to-estimation)
-  - [PU LC8.14](#pu-lc814)
 
 # Prerequisites
 
@@ -293,4 +292,126 @@ bootstrap_means |>
 
 ![](08_estimation_confidenceIntervals_bootstrapping_files/figure-commonmark/unnamed-chunk-2-1.png)
 
-## PU LC8.14
+#### LC8.14
+
+> Construct a 95% confidence interval for the *median* weight of *all*
+> almonds with the percentile method. Is it appropriate to also use the
+> standard error method?
+
+Okay, I think the idea is to do some bootstrap sampling from the
+`almonds_bowl` data.
+
+``` r
+almonds_bowl_rep <- 
+  almonds_bowl |> 
+    specify(formula = weight ~ NULL) |> 
+    generate(reps = 1000, method = "bootstrap")
+```
+
+    Setting `type = "bootstrap"` in `generate()`.
+
+``` r
+almonds_bowl_rep |> 
+  calculate(stat = "median") |> 
+  get_ci(level = 0.95, type = "percentile")
+```
+
+    # A tibble: 1 × 2
+      lower_ci upper_ci
+         <dbl>    <dbl>
+    1      3.7      3.7
+
+Now we could technically also do the standard error method:
+
+``` r
+x_bar <- 
+  almonds_bowl |> 
+    specify(formula = weight ~ NULL) |> 
+    calculate(stat = "median")
+
+almonds_bowl_rep |> 
+  get_ci(type = "se", point_estimate = x_bar, level = .95)
+```
+
+    # A tibble: 1 × 2
+      lower_ci upper_ci
+         <dbl>    <dbl>
+    1     2.93     4.47
+
+Ah, I just saw that with *all* almonds, only those from `almonds_sample`
+were meant. So I will do the above things with that data again:
+
+``` r
+almonds_sample_rep <- 
+  almonds_sample |> 
+    specify(formula = weight ~ NULL) |> 
+    generate(reps = 1000, type = "bootstrap")
+
+almonds_sample_rep_ci <- 
+  almonds_sample_rep |> 
+    calculate(stat = "median") |> 
+    get_ci()
+
+almonds_sample_rep |> 
+  calculate(stat = "median") |> 
+  visualize() +
+  shade_ci(endpoints = almonds_sample_rep_ci)
+```
+
+![](08_estimation_confidenceIntervals_bootstrapping_files/figure-commonmark/unnamed-chunk-5-1.png)
+
+Ah yeah, an then we get to the issue that these values are not normally
+distributed, making the standard error method erroneous in that case.
+
+##### !clarity
+
+Okay, I didn’t get that with *all* almonds, only all of the sample were
+meant. I first used the `almonds_bowl` data.
+
+#### LC8.15
+
+> What are the advantages of using `infer` for building confidence
+> intervals?
+
+#### LC8.16
+
+> What is the main purpose of bootstrapping in statistical inference?
+
+- A. To visualize data distributions and identify outliers.
+
+- B. To generate multiple samples from the original data for estimating
+  parameters.
+
+- C. To replace missing data points with the mean of the dataset.
+
+- D. To validate the assumptions of a regression model.
+
+#### LC8.17
+
+> Which function denotes the variables of interest for inference?
+
+- A. `rep_sample_n()`
+- B. `calculate()`
+- C. `specify()`
+- D. `visualize()`
+
+##### !error
+
+Question of LC8.17 in parentheses.
+
+#### LC8.18
+
+> What is a key difference between the percentile method and the
+> standard error method for constructing confidence intervals using
+> bootstrap samples?
+
+- A. The percentile method requires the population standard deviation.
+
+- B. The percentile method uses the middle 95% of bootstrap statistics,
+  while the standard error method relies on the estimated standard
+  error.
+
+- C. The standard error method always results in a narrower confidence
+  interval.
+
+- D. The percentile method requires more bootstrap samples.
