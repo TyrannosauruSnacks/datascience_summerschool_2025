@@ -1,4 +1,4 @@
-# Hypthesis Testing
+# Hypothesis Testing
 Max Hachemeister
 2026-03-04
 
@@ -118,7 +118,7 @@ null_distribution |>
     # A tibble: 1 × 1
       p_value
         <dbl>
-    1   0.071
+    1   0.069
 
 ``` r
 bootstrap_distribution <- 
@@ -135,7 +135,7 @@ percentile_ci
     # A tibble: 1 × 2
       lower_ci upper_ci
          <dbl>    <dbl>
-    1 -0.00202   0.0713
+    1 -0.00157   0.0710
 
 ``` r
 bootstrap_distribution |> 
@@ -234,3 +234,56 @@ simulated data so to observe how likely the observed value would be
 under the null hypotheses, which is expressed through the $p$-value. If
 this would seem very unlikely we could conclude that an alternative
 hypothesis might be more plausible.
+
+##### !error
+
+9.5.3
+
+However, this is not possible as there will always be the possibility of
+committing one of these *error\[s\]* when making a decision based on
+sample data.
+
+#### LC9.5
+
+> What is wrong about saying, “The defendant is innocent.” based on the
+> US system of criminal trials?
+
+As the court is only trying to decide whether someone is guilty or not a
+not guilty ruling just says that there are not enough evidence for the
+guilt, but that does not mean there are any evidence for the innocence,
+which would be a different task to begin with.
+
+#### LC9.6
+
+> What is the purpose of hypothesis testing?
+
+Hypothesis testing is foremost a structured way of furthering scientific
+inquiry in a diligent and therefore productive manner by allowing only
+those implications that seem probable beyond a reasonable doubt to shape
+the understanding of things.
+
+#### LC9.7
+
+> What are some flaws with hypothesis testing? How could we alleviate
+> them?
+
+Hypothesis testing, even though structured and well thought out, is at
+the end a matter of study design and the rational choice of acceptable
+uncertainty. I can be prone to either falsely rejecting a true null
+hypothesis or accepting one that is actually false. Because we are
+mostly sampling from much larger and diverse populations, our findings
+might not be true even if the testing procedure itself was correctly
+conducted. We could alleviate that with more robust sampling methods,
+larger samples, or an better sampling design. Generally we should employ
+state of the art tools an knowledge, but foremost be knowledgable about
+any tools we use for inferring about the truth of our world.
+
+#### LC9.8
+
+> Consider two $\alpha$ significance levels of 0.1 and 0.01. Of the two,
+> which would lead to a higher chance of commiting a Type I error?
+
+A significance level ($\alpha$) of 0.1 would imply a higher chance of a
+Type I error, because this would translate to – in colloquial terms – a
+10% chance of rejecting a actually true null hypothesis, while an
+$\alpha$ of 0.01 would mean only a chance of 1% in that regard.
