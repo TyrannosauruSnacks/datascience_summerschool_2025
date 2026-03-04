@@ -331,14 +331,17 @@ meant. I first used the `almonds_bowl` data.
 > What are the advantages of using `infer` for building confidence
 > intervals?
 
+A coherent interface, practical function wrappers, and a structure that
+makes iterative inference and working with multiple variable more efficient.
+
 #### LC8.16
 
 > What is the main purpose of bootstrapping in statistical inference?
 
   * A. To visualize data distributions and identify outliers.
   
-  * B. To generate multiple samples from the original data for estimating
-       parameters.
+  * *B. To generate multiple samples from the original data for estimating*
+       *parameters.*
        
   * C. To replace missing data points with the mean of the dataset.
   
@@ -350,7 +353,7 @@ meant. I first used the `almonds_bowl` data.
 
   * A. `rep_sample_n()`
   * B. `calculate()`
-  * C. `specify()`
+  * *C. `specify()`*
   * D. `visualize()`
 
 ##### !error
@@ -365,11 +368,75 @@ Question of LC8.17 in parentheses.
 
   * A. The percentile method requires the population standard deviation.
   
-  * B. The percentile method uses the middle 95% of bootstrap statistics,
-       while the standard error method relies on the estimated standard
-       error.
+  * *B. The percentile method uses the middle 95% of bootstrap statistics,*
+       *while the standard error method relies on the estimated standard*
+       *error.*
        
   * C. The standard error method always results in a narrower confidence
        interval.
        
   * D. The percentile method requires more bootstrap samples.
+  
+
+##### !error
+8.3.2 Confidence intervals and rate of convergence
+
+Let’s start with an illustration using the theory-based confidence interval. A 95% confidence interval for μ, when a sample of size n=100
+
+is used, is given by
+
+¯¯¯x±1.96σ√n
+
+when σ
+
+*is unknown or*
+
+¯¯¯x±1.98s√n
+
+when σ
+is unknown. We use 95% and n=100 for this illustration, but the
+
+##### !error
+8.3.3 Why bootstrap methods
+
+Second, in this chapter, we have *study [studied*] confidence intervals for the population mean μ, because it is a fundamental quantity and it is the foundation for other 
+
+```{r}
+mythbusters_yawn |> 
+  group_by(group, yawn) |> 
+  summarize(count = n(), .groups = "keep")
+```
+```{r}
+bootstrap_distribution_yawning <- 
+  mythbusters_yawn |> 
+    specify(formula = yawn ~ group, success = "yes") |> 
+    generate(reps = 1000, type = "bootstrap") |> 
+    calculate(stat = "diff in props", order = c("seed", "control"))
+bootstrap_distribution_yawning
+```
+```{r}
+bootstrap_ci_yawning_percentile <- 
+  bootstrap_distribution_yawning |> 
+    get_ci(type = "percentile", level = 0.95)
+bootstrap_ci_yawning_percentile
+
+diff_in_prop_obs <- 
+  mythbusters_yawn |> 
+  specify(formula = yawn ~ group, success = "yes") |> 
+  calculate(stat = "diff in props", order = c("seed", "control"))
+diff_in_prop_obs
+
+bootstrap_ci_yawning_stderror <- 
+  bootstrap_distribution_yawning |> 
+  get_ci(type = "se", point_estimate = diff_in_prop_obs)
+bootstrap_ci_yawning_stderror
+
+bootstrap_distribution_yawning |> 
+  visualize() +
+  geom_vline(xintercept = 0) +
+  shade_ci(endpoints = bootstrap_ci_yawning_percentile, fill = NULL) +
+  shade_ci(endpoints = bootstrap_ci_yawning_stderror, color = "hotpink",
+           fill = NULL)
+  
+```
+
