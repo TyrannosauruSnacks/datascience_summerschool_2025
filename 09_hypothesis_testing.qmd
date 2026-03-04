@@ -1,0 +1,201 @@
+---
+title:       "Hypthesis Testing"
+author:      "Max Hachemeister"
+date:        last-modified
+date-format: iso
+format:
+  gfm:
+    toc:     true
+---
+
+# Prerequisites
+
+```{r}
+#| label: setup
+#| results: false
+
+library(tidyverse)
+library(moderndive)
+library(infer)
+library(nycflights23)
+library(ggplot2movies)
+theme_set(theme_light())
+```
+
+##### !error
+*Many of the relevant concepts, ideas, and* we have already introduced many 
+of the necessary concepts to understand hypothesis testing in Chapters 7 
+and 8. 
+
+##### !error
+introduce the activity that motivates the simulation-based approach for 
+two-sample problems, data collected from *Spotify[,] to* investigate whether
+metal music is more popular than deep-house music. In Sections 9.3, 9.4, and
+9.5 we
+
+#### !error
+9.1.1
+
+part from the null hypothesis. We find this simplification convenient as we 
+focus on the equal part of the null hypothesis only *and [it] becomes*
+*clearer* that evidence against the null hypothesis may come only with 
+values to the left of 3.6, hence
+
+
+##### !error
+The decision made by the authors to call a song “popular” if it is above 
+the 75th percentile (3rd quartile) of popularity is arbitrary and could be 
+changed to any other value.*)*
+
+##### !clarity
+So, based on our sample of nm=1000 metal tracks and *nf=1000* deep house 
+tracks, the point estimate for pm−pd
+
+is the difference in sample proportions
+
+ˆpm−ˆ*pf*=0.563−0.529=0.034.
+
+This difference in favor of metal songs of 0.034 (3.4 percentage points) is 
+
+> Shouldn't these be $p_d$?
+
+##### !clarity
+
+the samples would be the nm=1000 metal songs and the *nf=1000* deep house songs.
+
+> Shouldn't this be $n_d$?
+>
+> This is also a paragraph down below
+
+In our case, how will the difference in sample proportions *ˆpm−ˆpf* vary due to sampling under H0? Recall from
+
+```{r}
+spotify_metal_deephouse <- 
+  spotify_by_genre |> 
+    filter(track_genre %in% c("metal", "deep-house")) |> 
+    select(track_genre, artists, track_name, popularity, popular_or_not)
+```
+
+```{r}
+obs_diff_prop <- 
+  spotify_metal_deephouse |> 
+    specify(formula = popular_or_not ~ track_genre, success = "popular") |>     calculate(stat = "diff in props", order = c("metal", "deep-house"))
+
+null_distribution <- 
+  spotify_metal_deephouse |> 
+    specify(formula = popular_or_not ~ track_genre, success = "popular") |>     hypothesize(null = "independence") |> 
+    generate(reps = 1000, type = "permute") |> 
+    calculate(stat = "diff in props", order = c("metal", "deep-house"))
+```
+
+
+```{r}
+null_distribution |> 
+  visualize(bins = 25) +
+  shade_p_value(obs_stat = obs_diff_prop, direction = "right")
+
+null_distribution |> 
+  get_p_value(obs_stat = obs_diff_prop, direction = "right")
+  
+```
+
+
+```{r}
+bootstrap_distribution <- 
+  spotify_metal_deephouse |> 
+    specify(formula = popular_or_not ~ track_genre, success = "popular") |>     generate(reps = 1000, type = "bootstrap") |> 
+    calculate(stat = "diff in props", order = c("metal", "deep-house"))
+
+percentile_ci <- 
+  bootstrap_distribution |> 
+  get_confidence_interval(level = 0.90, type = "percentile")
+percentile_ci
+
+bootstrap_distribution |> 
+  visualize() +
+  shade_ci(endpoints = percentile_ci)
+  
+```
+
+##### !clarity
+9.4.1
+
+Going back to the *pennies* example from Chapter 8, say we wanted to test if the mean weight of all chocolate-covered almonds was equal to 3.5 grams or not. 
+
+> I think this refers to the almonds.
+
+
+##### !clarity
+9.4.1
+
+We would be testing the value of a “point” μ
+
+, the mean weight in grams of all chocolate-covered almonds, as follows
+
+*H0:μ=3.5vs HA:μ≠3.5*
+
+> In the sections 9.1.1 the values were 3.6
+
+
+#### LC9.1
+
+> Why does the following code produce an error? In other words, what about
+> the response and predictor variables makes this not a possible 
+> computation with the `infer` package?
+
+```{r}
+#| error: true
+
+library(moderndive)
+library(infer)
+null_distribution_mean <- 
+  spotify_metal_deephouse |> 
+  specify(formula = popular_or_not ~ track_genre, success = "popular") |> 
+  hypothesize(null = "independence") |> 
+  generate(reps = 1000, type = "permute") |> 
+  calculate(stat = "diff in means", order = c("metal", "deep-house"))
+```
+
+This code gives an error because we are asking it to calculate means, but
+the variables are binary, so there is no mean but only a proportion to
+be calculated. Which is technically the mean of 1s and 0s, but it probably
+makes a difference in the hypothesize step and such.
+
+#### LC9.2 
+
+> Why are we relatively confident that the distributions of the sample
+> proportions will be good approximations of the population distributions
+> of popularity proportions for the two genres?
+
+We are relatively confident in our distribution of sample proportions
+reflecting the population's distribution of sample proportions because our
+sample is a random sample of that population and as we repeat the sampling
+sufficiently often we will reach the point at which the mechanic of the central limit theorem comes into play; that is, if the sampling size is 
+either large enough, or the sample is repeated often enought we will the resulting distribution of sample statistics will follow a normal
+distribution approximating that of the population.
+
+#### LC9.3
+
+> Using the definition of $p$-value, write in words what the $p$-value
+> represents for the hypothesis test comparing the popularity rates for
+> metal and deep house.
+
+The $p$-value in the given case represents how likely we would observe 
+difference in popularity proportions from our sample if this difference
+were assumed to be up to chance (random). The lower this value the more
+likely it is that the difference in popularity is not just by chance.
+
+#### LC9.4
+
+> Describe in a paragraph how we used Allen Downey's diagram to coclude
+> if a statistical difference existed between the popularity rate of metal
+> and deep house for the Spotify example.
+
+We basically followed the diagram by first calculating the observed 
+effect/test statistic from our original sample. In the next step we 
+defined the null hypotheses and simulated data that would arise under this
+hypotheses. Then we related the observed value with those from the
+simulated data so to observe how likely the observed value would be under
+the null hypotheses, which is expressed through the $p$-value. If this
+would seem very unlikely we could conclude that an alternative hypothesis
+might be more plausible.
