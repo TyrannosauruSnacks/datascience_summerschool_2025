@@ -451,7 +451,7 @@ movies_action_romance |>
 # faceted histogram
 movies_action_romance |> 
   ggplot(aes(rating)) +
-  geom_histogram(binwidth = 0.5) +
+  geom_histogram(binwidth = 0.1) +
   facet_wrap(~ genre)
 ```
 
@@ -462,3 +462,28 @@ we could compare the the two samples directly to this extend. Though it
 should be noted that the size of these samples are around 4000 for each
 genre, or roughly 9000 in total. So this is not always feasible and we 
 could approximate this with the resampling we did.
+
+#### T-test
+```{r}
+movies_action_romance |> 
+  t_test(formula = rating ~ genre,
+         order = c("action", "romance"),
+         alternative = "two-sided")
+
+movies_sample |> 
+  t_test(formula = rating ~ genre,
+         order = c("Action", "Romance"),
+         alternative = "two-sided")
+```
+
+##### !clarity
+
+9.7.1 Theory-based approach
+
+Based on the p-value = 0.005 we reject the null hypothesis, the average
+rating for the Romance movies is not the same as the average rating for the
+Action movies. This result is similar to the one calculated using the
+simulation-based approach.
+
+> In the sections before we set the significance level to 0.001. Which
+> would mean we do not reject the null hypotheses.

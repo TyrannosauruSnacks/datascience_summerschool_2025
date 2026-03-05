@@ -123,7 +123,7 @@ null_distribution |>
     # A tibble: 1 × 1
       p_value
         <dbl>
-    1   0.073
+    1   0.069
 
 ``` r
 bootstrap_distribution <- 
@@ -140,7 +140,7 @@ percentile_ci
     # A tibble: 1 × 2
       lower_ci upper_ci
          <dbl>    <dbl>
-    1 -0.00334   0.0686
+    1 -0.00226   0.0708
 
 ``` r
 bootstrap_distribution |> 
@@ -365,7 +365,7 @@ null_distribution_movies |>
     # A tibble: 1 × 1
       p_value
         <dbl>
-    1   0.004
+    1  0.0028
 
 ``` r
 null_distribution_movies |> 
@@ -403,7 +403,7 @@ null_distribution_median |>
     # A tibble: 1 × 1
       p_value
         <dbl>
-    1   0.006
+    1   0.008
 
 ``` r
 null_distribution_median |> 
@@ -551,7 +551,7 @@ movies_action_romance |>
 # faceted histogram
 movies_action_romance |> 
   ggplot(aes(rating)) +
-  geom_histogram(binwidth = 0.5) +
+  geom_histogram(binwidth = 0.1) +
   facet_wrap(~ genre)
 ```
 
@@ -564,3 +564,41 @@ we could compare the the two samples directly to this extend. Though it
 should be noted that the size of these samples are around 4000 for each
 genre, or roughly 9000 in total. So this is not always feasible and we
 could approximate this with the resampling we did.
+
+#### T-test
+
+``` r
+movies_action_romance |> 
+  t_test(formula = rating ~ genre,
+         order = c("action", "romance"),
+         alternative = "two-sided")
+```
+
+    # A tibble: 1 × 7
+      statistic  t_df   p_value alternative estimate lower_ci upper_ci
+          <dbl> <dbl>     <dbl> <chr>          <dbl>    <dbl>    <dbl>
+    1     -30.3 8540. 6.41e-192 two.sided     -0.927   -0.987   -0.867
+
+``` r
+movies_sample |> 
+  t_test(formula = rating ~ genre,
+         order = c("Action", "Romance"),
+         alternative = "two-sided")
+```
+
+    # A tibble: 1 × 7
+      statistic  t_df p_value alternative estimate lower_ci upper_ci
+          <dbl> <dbl>   <dbl> <chr>          <dbl>    <dbl>    <dbl>
+    1     -2.91  65.8 0.00498 two.sided      -1.05    -1.77   -0.328
+
+##### !clarity
+
+9.7.1 Theory-based approach
+
+Based on the p-value = 0.005 we reject the null hypothesis, the average
+rating for the Romance movies is not the same as the average rating for
+the Action movies. This result is similar to the one calculated using
+the simulation-based approach.
+
+> In the sections before we set the significance level to 0.001. Which
+> would mean we do not reject the null hypotheses.
