@@ -1,8 +1,13 @@
 # Hypothesis Testing
 Max Hachemeister
-2026-03-04
+2026-03-05
 
 - [Prerequisites](#prerequisites)
+  - [9.6 Case Study: Are Action or Romance Movies Rated
+    Higher?](#96-case-study-are-action-or-romance-movies-rated-higher)
+    - [Visualize](#visualize)
+    - [Summary statistics](#summary-statistics)
+    - [`infer` workflow](#infer-workflow)
 
 # Prerequisites
 
@@ -118,7 +123,7 @@ null_distribution |>
     # A tibble: 1 × 1
       p_value
         <dbl>
-    1   0.069
+    1   0.073
 
 ``` r
 bootstrap_distribution <- 
@@ -135,7 +140,7 @@ percentile_ci
     # A tibble: 1 × 2
       lower_ci upper_ci
          <dbl>    <dbl>
-    1 -0.00157   0.0710
+    1 -0.00334   0.0686
 
 ``` r
 bootstrap_distribution |> 
@@ -287,3 +292,275 @@ A significance level ($\alpha$) of 0.1 would imply a higher chance of a
 Type I error, because this would translate to – in colloquial terms – a
 10% chance of rejecting a actually true null hypothesis, while an
 $\alpha$ of 0.01 would mean only a chance of 1% in that regard.
+
+## 9.6 Case Study: Are Action or Romance Movies Rated Higher?
+
+### Visualize
+
+``` r
+# Boxplot
+movies_sample |> 
+  ggplot(aes(genre, rating)) +
+  geom_boxplot() +
+  labs(
+    x = "Movie Genre",
+    y = "IMDb Rating"
+  )
+```
+
+![](09_hypothesis_testing_files/figure-commonmark/unnamed-chunk-6-1.png)
+
+``` r
+# Faceted Histogram
+movies_sample |>
+  ggplot(aes(rating)) +
+  geom_histogram(binwidth = .1) +
+  facet_wrap(~genre)
+```
+
+![](09_hypothesis_testing_files/figure-commonmark/unnamed-chunk-6-2.png)
+
+### Summary statistics
+
+``` r
+movies_sample |> 
+  group_by(genre) |> 
+  summarize(
+    n = n(),
+    mean_rating = mean(rating),
+    std_dev = sd(rating)
+  )
+```
+
+    # A tibble: 2 × 4
+      genre       n mean_rating std_dev
+      <chr>   <int>       <dbl>   <dbl>
+    1 Action     32        5.28    1.36
+    2 Romance    36        6.32    1.61
+
+##### !clarity
+
+> In the tables about the sampling scenario some symbols have and some
+> have . Maybe homogenize that, if there are meant to mean the same.
+
+### `infer` workflow
+
+``` r
+null_distribution_movies <-   
+  movies_sample |> 
+    specify(formula = rating ~ genre) |> 
+    hypothesize(null = "independence") |> 
+    generate(reps = 5000, type = "permute") |> 
+    calculate(stat = "diff in means", order = c("Action", "Romance"))
+
+obs_diff_mean_movies <- 
+  movies_sample |> 
+  specify(formula = rating ~ genre) |> 
+  calculate(stat = "diff in means", order = c("Action", "Romance"))
+
+null_distribution_movies |> 
+  get_p_value(obs_stat = obs_diff_mean_movies, direction = "both")
+```
+
+    # A tibble: 1 × 1
+      p_value
+        <dbl>
+    1   0.004
+
+``` r
+null_distribution_movies |> 
+  visualize() +
+  shade_p_value(obs_stat = obs_diff_mean_movies, direction = "both")
+```
+
+![](09_hypothesis_testing_files/figure-commonmark/unnamed-chunk-8-1.png)
+
+#### LC9.9
+
+> Conduct the same analysis comparing action movies versus romantic
+> movies using the median rating instead of the mean rating. What was
+> different and what was the same?
+
+Okay, `infer` workflow lessgooo:
+
+``` r
+null_distribution_median <- 
+  movies_sample |> 
+    specify(formula = rating ~ genre) |> 
+    hypothesize(null = "independence") |> 
+    generate(reps = 1000, type = "permute") |>
+    calculate(stat = "diff in medians", order = c("Action", "Romance"))
+
+obs_diff_median_movies <- 
+  movies_sample |> 
+  specify(formula = rating ~ genre) |> 
+  calculate(stat = "diff in medians", order = c("Action", "Romance"))
+
+null_distribution_median |> 
+  get_p_value(obs_stat = obs_diff_median_movies, direction = "both")
+```
+
+    # A tibble: 1 × 1
+      p_value
+        <dbl>
+    1   0.006
+
+``` r
+null_distribution_median |> 
+  visualize() +
+  shade_p_value(obs_stat = obs_diff_median_movies, direction = "both")
+```
+
+![](09_hypothesis_testing_files/figure-commonmark/unnamed-chunk-9-1.png)
+
+The main difference were just two lines, in which I defined “median”
+instead of “mean”. However, the results were interestingly different;
+with the null distribution being more dense in the center and the
+$p$-value even higher, so even less evidence for a difference in median
+rating of romance and action movies.
+
+#### LC9.10
+
+> What conclusion can you make from viewing the faceted histogram
+> looking at `rating` versus `genre` that you could not see when looking
+> at the boxplot?
+
+Let’s make the facet view (which I already did above):
+
+``` r
+movies_sample |> 
+  ggplot(aes(rating)) +
+  geom_histogram() +
+  facet_wrap(~ genre)
+```
+
+    `stat_bin()` using `bins = 30`. Pick better value `binwidth`.
+
+![](09_hypothesis_testing_files/figure-commonmark/unnamed-chunk-10-1.png)
+
+What I can mostly see that the box plots did not show is that the
+distribution of the sample values is not normal, so we could not
+immediately conduct sensible comparisons between the two. But yeah, that
+was true from the beginning I guess. That’s what the $t$-distribution
+and resampling are made for.
+
+So we can see that the distribution of values is rather serrated, which
+a box plot would not show.
+
+#### LC9.11
+
+> Describe in paragraph how we used Allen Downey’s diagram to concule if
+> a statistical difference existed between mean movie ratings for action
+> an romance movies.
+
+To follow Allen Downey’s diagram, we first got our observed sample
+statistic from the sample. Then we simulated from that sample a
+population in accordance with the null hypothesis, got the distribution
+of the test statistic from this simulated data, and lastly compared the
+observed value with this distribution to see how likely it could have
+arisen from the randomness of the hypothesized null distribution.
+
+#### LC9.12
+
+> Why are we relatively confident that the distributions of the sample
+> ratings will be good approximations of the population distributions of
+> ratings for the two genres?
+
+We are confident that our simulated sampling distributions are good
+approximations for the population distribution because, firstly, we are
+resampling so many times that the central limit theorem comes into play,
+which states that with enough sampling effort the sampling distribution
+of a population parameter will reflect the mean and deviance of the true
+population.
+
+#### LC9.13
+
+> Using the definition of $p$-value, write in words what the $p$-value
+> represents for the hypothesis test comparing the mean rating of
+> romance to action movies.
+
+The $p$-value gives the probability of value as extreme, or more extreme
+as the observed one under the conditionins of the null hypothesis.
+
+#### LC9.14
+
+> What is the value of the $p$-value for the two-sided hypothesis test
+> comparing the mean rating of romance to action movies?
+
+In case of the online book it’s 0.004
+
+#### LC9.15
+
+> Test your data-wrangling knowledge and EDA skills:
+>
+> - Use `dplyr` and `tidyr` to create the necessary data frames focused
+>   on only action and romance movies (but not both) from the `movies`
+>   data frame in the `ggplot2movies` package.
+>
+> - Make a boxplot and faceted histogram of this population data
+>   comparing ratings of action and romance movies from IMDb.
+>
+> - Discuss how these plots compare to the similar plots produced for
+>   the `movies_sample` data.
+
+##### Create the data frame
+
+``` r
+movies_action_romance <- 
+  movies |> 
+    #get only those movies that have either Action or Romance
+    filter((Romance == 1 & Action == 0) | (Action == 1 & Romance == 0)) |> 
+    #get only columns of interest
+    select(title, year, rating, Action, Romance) |> 
+    #put action and romance in one 'genre' column
+    mutate(genre = case_when(Action == 1 ~ "action",
+                             Romance == 1 ~ "romance"),
+           # and drop the columns not needed anymore
+           .keep = "unused")
+    
+movies_action_romance
+```
+
+    # A tibble: 8,878 × 4
+       title                      year rating genre  
+       <chr>                     <int>  <dbl> <chr>  
+     1 $windle                    2002    5.3 action 
+     2 'A' gai waak               1983    7.1 action 
+     3 'A' gai waak juk jaap      1987    7.2 action 
+     4 'Crocodile' Dundee II      1988    5   action 
+     5 'Gator Bait                1974    3.5 action 
+     6 'I Know Where I'm Going!'  1945    7.7 romance
+     7 'M' Word                   1996    4.6 romance
+     8 'Sheba, Baby'              1975    5.5 action 
+     9 'Til There Was You         1997    4.8 romance
+    10 'Til We Meet Again         1940    6.3 romance
+    # ℹ 8,868 more rows
+
+##### Make box plots and faceted histograms
+
+``` r
+# box plot
+movies_action_romance |> 
+  ggplot(aes(genre, rating)) +
+  geom_boxplot()
+```
+
+![](09_hypothesis_testing_files/figure-commonmark/unnamed-chunk-12-1.png)
+
+``` r
+# faceted histogram
+movies_action_romance |> 
+  ggplot(aes(rating)) +
+  geom_histogram(binwidth = 0.5) +
+  facet_wrap(~ genre)
+```
+
+![](09_hypothesis_testing_files/figure-commonmark/unnamed-chunk-12-2.png)
+
+##### Describe the plot
+
+These plots from the whole data aset appear quite evenly distributed, so
+we could compare the the two samples directly to this extend. Though it
+should be noted that the size of these samples are around 4000 for each
+genre, or roughly 9000 in total. So this is not always feasible and we
+could approximate this with the resampling we did.
