@@ -284,4 +284,208 @@ in Subsection 5.1.3, is the observed response minus the fitted value. If we
 denote the residuals with the letter e we get:
 
 
-## PU 10.2.6 Model fit and model assumptions
+### Residual Diagnostics
+
+#### Check Linearity
+```{r}
+# Get residuals from model.
+
+fit_and_residuals <- 
+  get_regression_points(lm_faithful)
+
+# Plot residuals over fitted values
+
+fit_and_residuals |> 
+  ggplot(aes(waiting_hat, residual)) +
+  geom_point() +
+  geom_hline(yintercept = 0, col = "blue")
+```
+
+##### !error
+
+Now, the observations in this dataset are only a subset of all the Old
+Faithful geyser eruptions that happen during this time frame and most
+or all of them are eruptions that *do[did] not happen[ed]* sequentially,
+one after the next.
+
+#### Check Normality
+```{r}
+# Plot residuals as histogram 
+fit_and_residuals |> 
+  ggplot(aes(residual, y = after_stat(density))) +
+  geom_histogram() +
+  geom_density()
+
+# Plot residuals with qq plot
+fit_and_residuals |> 
+  ggplot(aes(sample = residual)) +
+  geom_qq() +
+  geom_qq_line(color = "blue")
+```
+
+##### !clarity
+
+```{r}
+fit_and_residuals |>
+  ggplot(aes(sample = residual)) +
+  geom_qq() +
+  geom_qq_line(color = "blue")
+```
+ 
+> Should have put `color = "blue"` in `geom_qq_line()` to match the plot.
+
+#### Check Equality/Constancy
+
+Also known as *homoskedasticity*.
+
+```{r}
+# Plot residuals against regressor variable
+
+fit_and_residuals |> 
+  ggplot(aes(duration, residual)) +
+  geom_point(alpha = 0.6) +
+  geom_hline(yintercept = 0) +
+  labs(
+    x = "Duration",
+    y = "Residual"
+  )
+```
+
+#### LC10.7
+
+> Use the `un_member_states_2024` data frame included in the `moderndive`
+> package with response variable `fertility_rate_2022` and the regressor
+> `hdi_2022`. Make sure to omit missing values.
+>
+>   * Use the `get_regression_points()` function to get the observed
+>     observed values.
+> 
+>   * Perform a residual analysis and look for any systematic patterns in
+>     the residuals. Ideally, there should be little to no pattern but
+>     comment on what you find here.
+
+##### Tidy Data
+```{r}
+# tidy data
+un_tidy <- 
+  un_member_states_2024 |> 
+    na.omit() |> 
+    select(country, 
+           fert_rate = fertility_rate_2022,
+           hdi = hdi_2022)
+
+# Fit model
+lm_un <- 
+  lm(fert_rate ~ hdi, data = un_tidy)
+
+# Get regression points.
+un_regpoints <- 
+  lm_un |> 
+    get_regression_points()
+```
+
+##### Residual Analysis
+###### Linearity
+```{r}
+# Check linearity by plotting residuals over estimates
+
+un_regpoints |> 
+  ggplot(aes(fert_rate_hat, residual)) + 
+  geom_point() +
+  geom_hline(yintercept = 0, color = "blue")
+
+```
+
+It looks almost non-linear but the downward slope is kind of corrected by
+the increased spread of the points. So let's assume it's not blatantly
+non-linear.
+
+###### Independence
+
+We could check the independence either with another term like time.
+Or explain why we think that our sample surely is random.
+So for the sake of the exercise I assume the sample to be random.
+
+###### Normality
+
+```{r}
+# Plot histogram of residuals
+un_regpoints |> 
+  ggplot(aes(residual, after_stat(density))) +
+  geom_histogram() +
+  geom_density(color = "blue")
+
+# Plot qq-plot
+un_regpoints |> 
+  ggplot(aes(sample = residual)) +
+  geom_qq() +
+  geom_qq_line(color = "blue")
+  
+```
+
+Yeah both look close to what I think a normal distribution looks like.
+
+##### Equality of variance / Homoskedasticity
+
+```{r}
+# Plot residuals against regressor variable
+un_regpoints |> 
+  ggplot(aes(hdi, residual)) +
+  geom_point(alpha = 0.6) +
+  geom_hline(yintercept = 0)
+```
+
+The range of the residuals stay more or less within an value of 2 over the
+hdi range, but at the higher hdi the points both aggregate but also some
+more deviant values appear. Bou there seems no blatant heteroskedasticity.
+
+##### Verdict
+
+Overall the assumptions to properly fit a simple linear regression for
+inference are met.
+
+#### LC10.8
+
+> In the context of linear regression, a `p_value` of near zero for the
+> slope coefficient suggests which of the following?
+
+  * A. The intercept is statistically significant at a 95% confidence
+       level.
+        
+  * *B. There is strong evidence against the null hypothesis that the*
+       *slope coefficient is zero, suggesting there exists a linear*
+       *relationship between the explanatory and response variables.*
+        
+  * C. The variance of the response variable is significantly greater
+       than the variance of the explanatory variable.
+        
+  * D. The residuals are normally distributed with mean zero and constant
+       variance.
+       
+#### LC10.9
+
+> Explain whether or not the residual plot helps assess each one of the
+> following assumptions.
+
+  * Linearity of the relationships between variables
+  * Independence of the error terms
+  * Normality of the error terms
+  * Equality or constancy of variance
+
+Visualizing the residual can help assess all the above assumption to some
+extent. The only thing that might not easily be checked is the 
+independence of the error terms, if the variable causing the dependence
+has not been observed. However, if the sampling procedure can be deemed
+sufficiently random the independence of the error terms can also be 
+assumed.
+
+  
+#### LC10.10
+
+> If the residual plot against fitted values shows a "U-shaped" pattern,
+> what does this suggest?
+
+  * A. The variance of the residuals is constant.
+  * *B. The linearity assumption is violated.*
+  * C. The independence assumption of violated.
+  * D. The normality assumption is satisfied.
