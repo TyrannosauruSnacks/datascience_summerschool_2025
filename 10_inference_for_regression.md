@@ -12,6 +12,12 @@ Max Hachemeister
     - [Old Faithful Eruptions](#old-faithful-eruptions)
     - [Relating Basic Regression to Other
       Methods](#relating-basic-regression-to-other-methods)
+  - [Theory-based Inference for Simple Linear
+    Regression](#theory-based-inference-for-simple-linear-regression)
+    - [There is a wrapper function for
+      that](#there-is-a-wrapper-function-for-that)
+  - [PU 10.2.6 Model fit and model
+    assumptions](#pu-1026-model-fit-and-model-assumptions)
 
 # Prerequisites
 
@@ -218,13 +224,13 @@ spotify_for_anova |>
 ```
 
     # A tibble: 5 × 4
-      artists                                 track_name      popularity track_genre
-      <chr>                                   <chr>                <dbl> <chr>      
-    1 Jack Harlow                             First Class              0 hip-hop    
-    2 Kodak Black                             Love & War               0 hip-hop    
-    3 Hiphop Tamizha;Kaushik Krish;Padmalatha Kannala Kannal…         63 hip-hop    
-    4 All Time Low                            Merry Christma…          0 rock       
-    5 Russell Dickerson                       Yours                   67 country    
+      artists         track_name             popularity track_genre
+      <chr>           <chr>                       <dbl> <chr>      
+    1 Avery Anna      Narcissist                      0 country    
+    2 The Cranberries Zombie                         82 rock       
+    3 Ty Dolla $ign   Famous                          0 hip-hop    
+    4 David Bisbal    Me Enamoré De Ti                0 rock       
+    5 Brett Eldredge  Christmas Time Is Here          1 country    
 
 ``` r
 # Check with Box plots
@@ -299,7 +305,7 @@ aov(popularity ~ track_genre, data = spotify_for_anova) |>
   $b_1$.
 
 - *B. They are linear combinations of the observed responses*
-  *$y_1, y_2, ..., y_n$.*
+  *$y_1, y_2,\dots, y_n$.*
 
 - C. They are always equal to the population parameters $b_0$ and $b_1$.
 
@@ -321,3 +327,110 @@ aov(popularity ~ track_genre, data = spotify_for_anova) |>
 
 - D. By subtracting the mean of the group from the mean of the other and
   using this difference as the predictor.
+
+## Theory-based Inference for Simple Linear Regression
+
+Back to `old-faithful`
+
+#### LC10.4
+
+> In the context of a linear regression model, what does the null
+> hypothesis $H_0 : \beta_1 = 0$ represent?
+
+- *A. There is no linear association between the response and the*
+  *explanatory variable.*
+
+- B. The difference between the observed and predicted values is zero.
+
+- C. The linear association between response and explanatory variable
+  crosses the origin
+
+- D. The probability of committing a Type II Error is zero.
+
+#### LC10.5
+
+> Which of the following is an assumption of the linear regression
+> model?
+
+- *A. The error terms $\epsilon_i$ are normally distributed with*
+  *constant variance.*
+
+- B. The error terms $\epsilon_i$ have a non-zero mean.
+
+- C. The error terms $\epsilon_i$ are dependent on each other.
+
+- D. The explanatory variable must be normally distributed.
+
+#### LC10.6
+
+> What does it mean when we say that the slope estimator $b_1$ is a
+> random variable?
+
+- A. $b_1$ will be the same for every sample taken from the population.
+
+- B. $b_1$ is a fixed value that does not change with different samples.
+
+- *C. $b_1$ can vary from sample to sample due to sampling variation.*
+
+- D. $b_1$ is always equal to the population slope $\beta_1$.
+
+### There is a wrapper function for that
+
+``` r
+lm_faithful |> 
+  get_regression_table()
+```
+
+    # A tibble: 2 × 7
+      term      estimate std_error statistic p_value lower_ci upper_ci
+      <chr>        <dbl>     <dbl>     <dbl>   <dbl>    <dbl>    <dbl>
+    1 intercept   79.5       7.31       10.9       0   65.0     93.9  
+    2 duration     0.371     0.032      11.4       0    0.307    0.435
+
+``` r
+summary(lm_faithful)
+```
+
+
+    Call:
+    lm(formula = waiting ~ duration, data = old_faithful_2024)
+
+    Residuals:
+       Min     1Q Median     3Q    Max 
+    -43.09 -15.46   3.68  13.26  40.74 
+
+    Coefficients:
+                Estimate Std. Error t value Pr(>|t|)    
+    (Intercept) 79.45872    7.31095   10.87   <2e-16 ***
+    duration     0.37110    0.03246   11.43   <2e-16 ***
+    ---
+    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+    Residual standard error: 20.37 on 112 degrees of freedom
+    Multiple R-squared:  0.5386,    Adjusted R-squared:  0.5344 
+    F-statistic: 130.7 on 1 and 112 DF,  p-value: < 2.2e-16
+
+##### !error
+
+10.2.5
+
+The statistic column contains the t-test statistic for b0 (first row)
+and b1 (second row). If we focus on b1, the t
+
+    -test statistic was constructed using the equation
+
+t=b1−0SE(b1)=*11.594*
+
+which corresponds to the hypotheses H0:β1=0 versus HA:β1≠0.
+
+> The table gives 11.4 for the $t$-value of $b_1$.
+
+##### !error
+
+10.2.6
+
+or all the observations *i=1,\[dots\],n.* Recall that the residual as
+defined in Subsection 5.1.3, is the observed response minus the fitted
+value. If we denote the residuals with the letter e we get:
+
+## PU 10.2.6 Model fit and model assumptions
