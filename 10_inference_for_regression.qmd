@@ -1,0 +1,204 @@
+---
+title:       "Inference for Regression"
+subtitle:    "My Personal Notes"
+author:      "Max Hachemeister"
+date:        last-modified
+date-format: iso
+format:
+  gfm:
+    toc:     true
+---
+
+# Prerequisites
+
+```{r}
+#| label: setup
+#| results: false
+
+library(tidyverse)
+library(moderndive)
+library(infer)
+library(gridExtra)
+library(GGally)
+theme_set(theme_light())
+```
+
+## 10.1
+
+### Tidy data
+```{r}
+UN_data_ch10 <- 
+  un_member_states_2024 |> 
+  select(country,
+         life_exp = life_expectancy_2022,
+         fert_rate = fertility_rate_2022) |> 
+  na.omit()
+UN_data_ch10
+```
+
+### Fit linear model
+```{r}
+linear_model <- 
+  lm(fert_rate ~ life_exp, data = UN_data_ch10)
+coef(linear_model)
+```
+
+### Plot data an model
+```{r}
+UN_data_ch10 |> 
+  ggplot(aes(life_exp, fert_rate)) +
+  geom_point() +
+  geom_smooth(method = "lm",
+              formula = y ~ x,
+              se = FALSE,
+              linewidth = 0.5) +
+  labs(
+    title = "Relationship of Fertility Rate and Life Expectancy",
+    x = "Life Expectancy",
+    y = "Fertility Rate",
+  )
+```
+
+### Determine values for single observations
+#### Get Row ID for France
+```{r}
+UN_data_ch10 |> 
+  rowid_to_column() |> 
+  filter(country == "France") |> 
+  pull(rowid)
+```
+
+#### Get Fit Data for France
+```{r}
+linear_model |> 
+  get_regression_points() |> 
+  filter(ID == 57)
+```
+
+### Old Faithful Eruptions
+#### Get Summary
+```{r}
+old_faithful_2024 |> 
+  select(duration, waiting) |> 
+  tidy_summary()
+```
+
+#### Visualize
+```{r}
+old_faithful_2024 |> 
+  ggplot(aes(duration, waiting)) +
+  geom_point(alpha = 0.5)
+```
+
+#### Fit Regression Model
+```{r}
+lm_faithful <- 
+  lm(waiting ~ duration, data = old_faithful_2024)
+
+coef(lm_faithful)
+sigma(lm_faithful)
+```
+
+So we can see that for each minute of eruption duration the waiting time
+increases by 0.371 minutes on average, while we expect the waiting time to
+be off for about 20.37 minutes off of the calculated time, on average.
+
+### Relating Basic Regression to Other Methods
+
+
+#### Two-sample difference in means
+Back to the `movies_sample`
+```{r}
+# Fit models and get infos
+lm_movies <- 
+  lm(rating ~ genre, data = movies_sample)
+
+get_regression_table(lm_movies)
+```
+
+#### ANOVA
+Now the `spotify_by_genre` example
+```{r}
+# Selects columns of interest and get a sample
+spotify_for_anova <- 
+  spotify_by_genre |> 
+  filter(track_genre %in% c("country", "hip-hop", "rock")) |> 
+  select(artists, track_name, popularity, track_genre)
+
+spotify_for_anova |> 
+  slice_sample(n = 5)
+```
+
+```{r}
+# Check with Box plots
+spotify_for_anova |> 
+  ggplot(aes(track_genre, popularity)) +
+  geom_boxplot()
+```
+
+```{r}
+# Check the means for each
+spotify_for_anova |> 
+  group_by(track_genre) |> 
+  summarize(mean_popularity = mean(popularity))
+```
+
+```{r}
+# Fit linear model
+lm_spotify <- 
+  lm(popularity ~ track_genre, data = spotify_for_anova)
+
+lm_spotify |> 
+  get_regression_table()
+```
+
+```{r}
+# Do an analysis of variance
+aov(popularity ~ track_genre, data = spotify_for_anova) |> 
+  anova()
+```
+
+#### LC10.1
+
+> What does the error term $\epsilon$ in the linear model 
+> $Y = \beta_0 + \beta_1 \cdot X + \epsilon$
+> represent?
+
+  * A. The exact value of the response variable.
+  * B. The predicted value of the response variable based on the model.
+  * *C. The part of the response variable not explained by the line.*
+  * D. The slope of the linear relationship between $X$ and $Y$.
+  
+#### LC10.2
+
+> Which of the following is a property of the least squares estimators
+> $b_0$ and $b_1$?
+
+  * A. They are biased estimators of the population parameters $b_0$ and
+       $b_1$.
+       
+  * *B. They are linear combinations of the observed responses*
+       *$y_1, y_2, ..., y_n$.*
+  
+  * C. They are always equal to the population parameters $b_0$
+       and $b_1$.
+       
+  * D. They depend on the specific values of the explanatory variable
+       $X$ only.
+       
+#### LC10.3
+
+> How can the difference in means between two groups be represented in a
+> linear regression model?
+
+  * A. By adding an interaction term between the groups and the response
+       variable.
+       
+  * B. By fitting separate regression lines for each group and comparing
+       their slopes.
+  
+  * *C. By including a dummy variable to represent the groups.*
+  
+  * D. By subtracting the mean of the group from the mean of the other and
+       using this difference as the predictor.
+  
