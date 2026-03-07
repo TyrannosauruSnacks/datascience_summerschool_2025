@@ -1,6 +1,6 @@
 # Inference for Regression
 Max Hachemeister
-2026-03-06
+2026-03-07
 
 - [Prerequisites](#prerequisites)
   - [10.1](#101)
@@ -17,6 +17,13 @@ Max Hachemeister
     - [There is a wrapper function for
       that](#there-is-a-wrapper-function-for-that)
     - [Residual Diagnostics](#residual-diagnostics)
+  - [10.3 Simulation-based Inference for Simple Linear
+    Regression](#103-simulation-based-inference-for-simple-linear-regression)
+    - [`infer` workflow](#infer-workflow)
+    - [Hypothesis test](#hypothesis-test)
+  - [10.4 The Multiple Linear Regression
+    Model](#104-the-multiple-linear-regression-model)
+    - [Data exploration](#data-exploration)
 
 # Prerequisites
 
@@ -223,13 +230,13 @@ spotify_for_anova |>
 ```
 
     # A tibble: 5 × 4
-      artists                  track_name           popularity track_genre
-      <chr>                    <chr>                     <dbl> <chr>      
-    1 Reba McEntire;The Isaacs What Child Is This?           0 country    
-    2 Jordan Sandhu            Band Theke                   58 hip-hop    
-    3 Brooks & Dunn            Boot Scootin' Boogie         71 country    
-    4 Bryan Adams              Summer Of '69                 0 rock       
-    5 The Killers              Mr. Brightside               86 rock       
+      artists                      track_name                 popularity track_genre
+      <chr>                        <chr>                           <dbl> <chr>      
+    1 Dolly Parton                 Jolene                             73 country    
+    2 Juice Newton                 Angel Of The Morning               59 country    
+    3 Josh Turner                  Go Tell It On The Mountain          1 country    
+    4 Kacey Musgraves;Leon Bridges Present Without A Bow               0 country    
+    5 YUNGBLUD;Machine Gun Kelly   acting like that                    0 rock       
 
 ``` r
 # Check with Box plots
@@ -667,3 +674,428 @@ assumed.
 - *B. The linearity assumption is violated.*
 - C. The independence assumption of violated.
 - D. The normality assumption is satisfied.
+
+## 10.3 Simulation-based Inference for Simple Linear Regression
+
+### `infer` workflow
+
+#### Get sampling distribution estimand by bootstrapping.
+
+``` r
+bootstrap_slope <- 
+  old_faithful_2024 |> 
+  specify(formula = waiting ~ duration) |> 
+  generate(reps = 1000, type = "bootstrap") |> 
+  calculate(stat = "slope")
+bootstrap_slope
+```
+
+    Response: waiting (numeric)
+    Explanatory: duration (numeric)
+    # A tibble: 1,000 × 2
+       replicate  stat
+           <int> <dbl>
+     1         1 0.342
+     2         2 0.343
+     3         3 0.408
+     4         4 0.361
+     5         5 0.363
+     6         6 0.376
+     7         7 0.403
+     8         8 0.391
+     9         9 0.357
+    10        10 0.383
+    # ℹ 990 more rows
+
+#### Check distribution
+
+``` r
+bootstrap_slope |> 
+  visualize()
+```
+
+![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-25-1.png)
+
+#### Get confidence interval from percentiles
+
+``` r
+bootstrap_slope_ci <- 
+  bootstrap_slope |> 
+    get_confidence_interval(type = "percentile", level = 0.95)
+bootstrap_slope_ci
+```
+
+    # A tibble: 1 × 2
+      lower_ci upper_ci
+         <dbl>    <dbl>
+    1    0.305    0.426
+
+#### Alternatively get confidence interval from standard error
+
+``` r
+# Get observed value
+observed_slope <- 
+  old_faithful_2024 |> 
+  specify(waiting ~ duration) |> 
+  calculate(stat = "slope")
+observed_slope
+```
+
+    Response: waiting (numeric)
+    Explanatory: duration (numeric)
+    # A tibble: 1 × 1
+       stat
+      <dbl>
+    1 0.371
+
+``` r
+# Calculate ci from that
+se_ci <- 
+  bootstrap_slope |> 
+  get_confidence_interval(level = 0.95, 
+                          type = "se", 
+                          point_estimate = observed_slope)
+se_ci
+```
+
+    # A tibble: 1 × 2
+      lower_ci upper_ci
+         <dbl>    <dbl>
+    1    0.311    0.431
+
+### Hypothesis test
+
+#### Generate null distribution
+
+``` r
+null_distribution <- 
+  old_faithful_2024 |> 
+  specify(waiting ~ duration) |> 
+  hypothesize(null = "independence") |> 
+  generate(reps = 1000, type = "permute")
+```
+
+#### Get test statistic
+
+``` r
+null_distribution_slope <- 
+  null_distribution |> 
+    calculate(stat = "slope")
+
+null_distribution_slope |> 
+  visualize()
+```
+
+![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-29-1.png)
+
+#### Get observed slope and compare with null distribution
+
+``` r
+# Get observed slope
+observed_slope <- 
+  old_faithful_2024 |> 
+  specify(waiting ~ duration) |> 
+  calculate(stat = "slope")
+
+# Visualize null distribution and shade in the p-value of observed value
+null_distribution_slope |> 
+  visualize() +
+  shade_p_value(obs_stat = observed_slope, direction = "both")
+```
+
+![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-30-1.png)
+
+``` r
+# And get actual p-value
+null_distribution_slope |> 
+  get_p_value(obs_stat = observed_slope, direction = "both")
+```
+
+    Warning: Please be cautious in reporting a p-value of 0. This result is an approximation
+    based on the number of `reps` chosen in the `generate()` step.
+    ℹ See `get_p_value()` (`?infer::get_p_value()`) for more information.
+
+    # A tibble: 1 × 1
+      p_value
+        <dbl>
+    1       0
+
+#### LC10.11
+
+> Repeat the inference but this time for the correlation coefficient
+> instead of the slope. Note the implementation of
+> `stat = "correlation"` in the `calculate()` function for the `infer`
+> package.
+
+##### `infer` workflow
+
+###### Generate distribution and ci for correlation
+
+``` r
+# Generate bootstrap and get correlation
+bootstrap_corr <- 
+  old_faithful_2024 |> 
+  specify(waiting ~ duration) |> 
+  generate(reps = 1000, type = "bootstrap") |> 
+  calculate(stat = "correlation")
+
+# Get observed correlation
+obs_corr <- 
+  old_faithful_2024 |> 
+  specify(waiting ~ duration) |> 
+  calculate(stat = "correlation")
+
+# Visually check for normality
+bootstrap_corr |> 
+  visualize()
+```
+
+![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-31-1.png)
+
+``` r
+## Looks normal
+
+# Get confidence interval from distribution percentiles
+bootstrap_corr_ci_perc <- 
+  bootstrap_corr |> 
+  get_confidence_interval(level = 0.95, type = "percentile")
+
+# Get confidence interval from standard error
+bootstrap_corr_ci_se <- 
+  bootstrap_corr |> 
+  get_confidence_interval(level = 0.95, 
+                          type = "se", 
+                          point_estimate = obs_corr)
+# Visualize
+bootstrap_corr |> 
+  visualize() +
+  shade_confidence_interval(endpoints = bootstrap_corr_ci_perc) +
+  shade_confidence_interval(endpoints = bootstrap_corr_ci_se, 
+                            color = "khaki")
+```
+
+![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-31-2.png)
+
+Both confidence intervals do not contain the value 0, we are therefore
+95% confident that there is a correlation between the duration and the
+time between eruptions, on average.
+
+##### Hypothesis check
+
+###### Generate null distribution and get observed value
+
+``` r
+null_distribution_corr <- 
+  old_faithful_2024 |> 
+  specify(formula = waiting ~ duration) |> 
+  hypothesize(null = "independence") |> 
+  generate(reps = 1000, type = "permute") |> 
+  calculate(stat = "correlation")
+
+obs_corr <- 
+  old_faithful_2024 |> 
+  specify(formula = waiting ~ duration) |> 
+  calculate(stat = "correlation")
+```
+
+###### Visualize and get p value
+
+``` r
+null_distribution_corr |> 
+  visualize() +
+  shade_p_value(obs_stat = obs_corr, direction = "both")
+```
+
+![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-33-1.png)
+
+``` r
+null_distribution_corr |> 
+  get_p_value(obs_stat = obs_corr, direction = "both")
+```
+
+    Warning: Please be cautious in reporting a p-value of 0. This result is an approximation
+    based on the number of `reps` chosen in the `generate()` step.
+    ℹ See `get_p_value()` (`?infer::get_p_value()`) for more information.
+
+    # A tibble: 1 × 1
+      p_value
+        <dbl>
+    1       0
+
+We tested the null hypothesis that the duration of and time between
+eruptions are not correlated. The p-value of the observed correlation is
+0 meaning that it is highly unlikely for the correlation to have been
+observed due to sampling variation under the null hypothesis. We
+therefore reject the hypothesis of independence and therefore assume the
+time between and the duration of eruptions to be correlated.
+
+#### LC10.12
+
+> Why is it appropriate to use the bootstrap percentile method to
+> construct a 95% confidence interval for the population slope $\beta_1$
+> in the Old Faithful data?
+
+- A. Because it assumes the slope follows a perfect normal distribution.
+
+- B. Because it relies on resampling the residuals instead of the
+  original data.
+
+- C. Because it requires the original data to be uniformly distributed.
+
+- *D. Because it does not require the bootstrap distribution to be*
+  *normally shaped.*
+
+#### LC10.13
+
+> What is the role of the permutation test in the hypothesis testing for
+> the population slope $\beta_1$?
+
+- A. It generates new samples to confirm the confidence interval
+  boundaries.
+
+- *B. It assesses whether the observed slope could have occurred by*
+  *chance under the null hypothesis of no relationship.*
+
+- C. It adjusts the sample size to reduce sampling variability.
+
+- D. It ensures the residuals of the regression model are normally
+  distributed.
+
+#### LC10.14
+
+> After generating a null distribution for the slope using `infer`, you
+> find the $p$-value to be near 0. What does this indicate about the
+> relationship between `waiting` and `duration` in the Old Faithful
+> data?
+
+- A. There is no evidence of a relationship between `waiting` and
+  `duration`
+
+- B. The observed slope is likely due to random variation under the null
+  hypothesis.
+
+- *C. The observed slope is significantly different from zero, *
+  *suggesting a meaningful relationship between `waiting` and *
+  *`duration`*
+
+- D. The null hypothesis cannot be rejected because the $p$-value is too
+  small.
+
+## 10.4 The Multiple Linear Regression Model
+
+### Data exploration
+
+#### Tidy Data
+
+``` r
+coffee_data <- 
+  coffee_quality |> 
+  select(
+    aroma,
+    flavor,
+    moisture_percentage,
+    continent_of_origin,
+    total_cup_points) |> 
+  mutate(continent_of_origin = factor(continent_of_origin))
+coffee_data
+```
+
+    # A tibble: 207 × 5
+       aroma flavor moisture_percentage continent_of_origin total_cup_points
+       <dbl>  <dbl>               <dbl> <fct>                          <dbl>
+     1  8.58   8.5                 11.8 South America                   89.3
+     2  8.5    8.5                 10.5 Asia                            87.6
+     3  8.33   8.42                10.4 Asia                            87.4
+     4  8.08   8.17                11.8 North America                   87.2
+     5  8.33   8.33                11.6 South America                   87.1
+     6  8.33   8.33                10.7 North America                   87  
+     7  8.33   8.17                 9.1 Asia                            86.9
+     8  8.25   8.25                10   Asia                            86.8
+     9  8.08   8.08                10.8 Asia                            86.7
+    10  8.08   8.17                11   Africa                          86.5
+    # ℹ 197 more rows
+
+#### Get Tidy Summary
+
+``` r
+coffee_data |> 
+  tidy_summary()
+```
+
+    # A tibble: 8 × 11
+      column               n group type    min    Q1  mean median    Q3   max     sd
+      <chr>            <int> <chr> <chr> <dbl> <dbl> <dbl>  <dbl> <dbl> <dbl>  <dbl>
+    1 aroma              207 <NA>  nume…  6.5   7.58  7.72   7.67  7.92  8.58  0.288
+    2 flavor             207 <NA>  nume…  6.75  7.58  7.74   7.75  7.92  8.5   0.280
+    3 moisture_percen…   207 <NA>  nume…  0    10.1  10.7   10.8  11.5  13.5   1.25 
+    4 total_cup_points   207 <NA>  nume… 78    82.6  83.7   83.8  84.8  89.3   1.73 
+    5 continent_of_or…    23 Afri… fact… NA    NA    NA     NA    NA    NA    NA    
+    6 continent_of_or…    84 Asia  fact… NA    NA    NA     NA    NA    NA    NA    
+    7 continent_of_or…    67 Nort… fact… NA    NA    NA     NA    NA    NA    NA    
+    8 continent_of_or…    33 Sout… fact… NA    NA    NA     NA    NA    NA    NA    
+
+#### Create a scatterplot matrix
+
+``` r
+coffee_data |> 
+  GGally::ggpairs()
+```
+
+![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-36-1.png)
+
+#### LC10.15
+
+> In a multiple linear regression model, what does the coefficient
+> $\beta_j$ represent?
+
+- A. The intercept of the model.
+
+- B. The standard error of the estimate.
+
+- C. The total variance explained by the model.
+
+- *D. The partial slope related to the regressor $X_j$, accounting* *for
+  all other regressors.*
+
+#### LC10.16
+
+> Why is it necessary to convert `continent_of_origin` to a factor when
+> preparing the `coffee_data` data frame for regression analysis?
+
+- A. To allow the regression model to interpret `continent_of_origin` as
+  a numerical variable.
+
+- *B. To create dummy variables that represent different categories of*
+  *`continent_of_origin`.*
+
+- C. To reduce the number of observations in the dataset.
+
+- D. To ensure the variable is included in the correlation matrix.
+
+#### LC10.17
+
+> What is the purpose of creating a scatterplot matrix in the context of
+> multiple linear regression?
+
+- A. To identify outliers that need to be removed from the dataset.
+
+- B. To test for normality of the residuals.
+
+- *C. To examine linear relationships between all variable pairs and*
+  *identify multicollinearity among regressors.*
+
+- D. To determine the appropriate number of dummy variables.
+
+#### LC10.18
+
+> In the multiple regression model for the `coffee_data`, what is the
+> role of dummy variables for `continent_of_origin`?
+
+- A. They are used to predict the values of the numerical regressors.
+
+- *B. They modify the intercept based on the specific category of*
+  *`continent_of_origin`.*
+
+- C. They serve to test the independence of residuals.
+
+- D. The indicate which observations should be excluded from the model.
