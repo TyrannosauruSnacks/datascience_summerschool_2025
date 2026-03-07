@@ -1,8 +1,12 @@
 ---
 title: "5 Simple Linear Regression"
+subtitle: "Personal Notes"
 author: "Max Hachemeister"
-format: html
-editor: visual
+date: last-modified
+date-format: iso
+format: gfm
+toc: true
+editor: source
 ---
 
 ## Prerequisites
@@ -106,7 +110,7 @@ UN_data_ch5 |>
        title = "Relationship between Life Expectancy and Fertility Rate")
 ```
 
-#### **LC5.1**
+#### LC5.1
 
 > Conduct a new exploratory data analysis with the same outcome variable y being `fert_rate` but with `obes_rate` as the new explanatory variable x:
 >
@@ -171,7 +175,7 @@ UN_data_ch5 |>
 
 Fertility Rate and Obesity Rate show a rather random distribution, with a main cluster around a fertility rate of 1.5 and a obesity rate of 25, while for fertility rates between 2 to 4 the obesity rate seems most random.
 
-#### **LC5.2**
+#### LC5.2
 
 > What is the main purpose of performing an exploratory data analysis (EDA) before fitting a regression model?
 
@@ -208,7 +212,7 @@ demographics_model <-
 coef(demographics_model)
 ```
 
-#### **LC5.4**
+#### LC5.4
 
 > Fit a simple linear regression using `lm(fert_rate ~ obes_rate, data = UN_data_ch5)` where `obes_rate` is the new explanatory variable $x$. Learn about the “best-fitting” line from the regression coefficients by applying the [`coef()`](https://rdrr.io/r/stats/coef.html) function. How do the regression results match up with your earlier exploratory data analysis?
 
@@ -225,7 +229,7 @@ coef(lm_fert_obes)
 
 The regression coefficient and the correlation coefficient are both negative, and also only represent a weak relationship between fertility rate and obesity rate.
 
-#### **LC5.5**
+#### LC5.5
 
 > What does the intercept term $b_0$ represent in simple linear regression?
 
@@ -237,7 +241,7 @@ The regression coefficient and the correlation coefficient are both negative, an
 
 -   D. The correlation between the outcome and explanatory variables.
 
-#### **LC5.6**
+#### LC5.6
 
 > What best describes the “slope” of a simple linear regression line?
 
@@ -249,7 +253,7 @@ The regression coefficient and the correlation coefficient are both negative, an
 
 -   D. The minimum value of the outcome variable.
 
-#### **LC5.7**
+#### LC5.7
 
 > What does a negative slope in a simple linear regression indicate?
 
@@ -281,7 +285,7 @@ Get the fitted values and the residuals for all observations:
 get_regression_points(demographics_model)
 ```
 
-#### **LC5.8**
+#### LC5.8
 
 > What is a “wrapper function” in the context of statistical modeling in R?
 
@@ -293,7 +297,7 @@ get_regression_points(demographics_model)
 
 -   D. A function that only handles categorical data in regression models.
 
-#### **LC5.9**
+#### LC5.9
 
 > Generate a data frame of the residuals of the *Learning check* model where you used `obes_rate` as the explanatory x variable.
 
@@ -303,7 +307,7 @@ Generate data frame with regression points for `lm_fert_obes` model:
 get_regression_points(lm_fert_obes)
 ```
 
-**LC5.10**
+LC5.10
 
 > Which of the following statements is true about the regression line in a simple linear regression model?
 
@@ -434,7 +438,7 @@ life_exp_by_continent |>
   mutate("Difference versus Africa" = mean - min(mean))
 ```
 
-#### **LC5.11**
+#### LC5.11
 
 > Conduct a new exploratory data analysis with the same explanatory variable x being `continent` but with `gdp_per_capita` as the new outcome variable y
 >
@@ -533,7 +537,7 @@ gdp_worldwide_diff_mean <-
 gdp_worldwide_diff_mean
 ```
 
-#### **LC5.12**
+#### LC5.12
 
 > When using a categorical explanatory variable in regression, what does the baseline group represent?
 
@@ -572,7 +576,7 @@ This is a reference to the deprecated first edition of that Book. Would it be se
 
 Amer does not refer to Asia. This is also like that in the corresponding mathjax expression.
 
-#### **LC5.13**
+#### LC5.13
 
 > Fit a linear regression using `lm(gdp_per_capita ~ continent, data = gapminder2022)` where `gdp_per_capita` is the new outcome variable. Get information about the “best-fitting” line from the regression coefficients. How do the regression results match up with the results from your previous exploratory data analysis?
 
@@ -594,7 +598,7 @@ The Intercept is the mean GDP per capita of all african countries and hence all 
 gdp_worldwide_diff_mean
 ```
 
-#### **LC5.14**
+#### LC5.14
 
 > How many “offsets” or differences from the baseline will a regression model output for a categorical variable with 4 levels?
 
@@ -624,7 +628,7 @@ Ah okay, because the model refers to a data frame, the `ID` argument can access 
 
 also here getting slightly other values and `Antigua and Barbaidos` seems a new value.
 
-#### **LC5.15**
+#### LC5.15
 
 > Which interpretation is correct for a positive coefficient in a regression model with a categorical explanatory variable?
 
@@ -636,7 +640,7 @@ also here getting slightly other values and `Antigua and Barbaidos` seems a new 
 
 -   D. The corresponding group has a lower response mean than the baseline’s.
 
-#### **LC5.16**
+#### LC5.16
 
 > Which of the following statements about residuals in regression is true?
 
@@ -648,7 +652,7 @@ also here getting slightly other values and `Antigua and Barbaidos` seems a new 
 
 -   D. Residuals are the predicted values in the model.
 
-#### **LC5.17**
+#### LC5.17
 
 > Using either the sorting functionality of RStudio’s spreadsheet viewer or using the data wrangling tools you learned in Chapter [3](https://moderndive.com/v2/wrangling.html#wrangling), identify the five countries with the five smallest (most negative) residuals? What do these negative residuals say about their life expectancy relative to their continents’ life expectancy?
 
@@ -662,7 +666,7 @@ get_regression_points(lm_life_continent,
 
 The negative residuals of these countries represents how much their life expectancy differs to the average of the other countries of the same continent.
 
-#### **LC5.18**
+#### LC5.18
 
 > Repeat this process, but identify the five countries with the five largest (most positive) residuals. What do these positive residuals say about their life expectancy relative to their continents’ life expectancy?
 
@@ -698,7 +702,7 @@ demographics_model |>
 
 ```
 
-**LC5.19**
+#### LC5.19
 
 > Note in Figure [5.12](https://moderndive.com/v2/regression.html#fig:three-lines) there are 3 points marked with dots and:
 >

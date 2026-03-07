@@ -1,8 +1,12 @@
 ---
 title: "4 Data Importing and Tidy Data"
+subtitle: "Personal Notes"
 author: "Max Hachemeister"
-format: html
-editor: visual
+date: last-modified
+date-format: iso
+format: gfm
+toc: true
+editor: source
 ---
 
 ## Prerequisites
@@ -37,22 +41,21 @@ library(markdown)
 
 ## Introduction
 
-### !Clarity
+#### !Clarity
 
 > You will see that having data stored in “tidy” format is about more than just what the everyday definition of the term “tidy” might suggest: having your data “neatly organized.” Instead, we define the term “tidy” as it’s used by data scientists who use R, outlining a set of rules by which data is saved.
 
-I'd like these sentences to be more homogenus, by using the same sentence deliminator for both. So either two colons, or two commas, or so.
+I'd like these sentences to be more homogenous, by using the same sentence deliminator for both. So either two colons, or two commas, or so.
 
 ```{r}
-library(readxl)
-dem_score <- read_excel("data/dem_score.xlsx",
-    sheet = "dem_score")
+library(readr)
+dem_score <- read_csv("https://moderndive.com/data/dem_score.csv")
 View(dem_score)
 ```
 
 ## 4.2 Tidy Data
 
-### **LC4.1**
+#### LC4.1
 
 > What are common characteristics of “tidy” data frames?
 
@@ -68,7 +71,7 @@ View(dem_score)
 
     -   yeah, these are the entries that have values like "33C/15F" or something.
 
-### **LC4.2**
+#### LC4.2
 
 > What makes “tidy” data frames useful for organizing data?
 
@@ -103,11 +106,11 @@ Now the values for `fatalities_years` are a bit ugly still, but that's not the t
 
 ## 4.3 Case study: democracy in Guatemala
 
-### !clarity
+#### !clarity
 
 I think introducing the `names_transform` argument, which only works with the `list` function is confusing. Yeah it's the elegant way, but this can also be achieved with tools we've already learned and `mutate` is also just one line of code. Ah yeah, doing this with mutate is also a new concept, we haven't really talked about converting column types very much.
 
-### **LC4.4**
+#### LC4.4
 
 > Convert the `dem_score` data frame into a “tidy” data frame and assign the name of `dem_score_tidy` to the resulting long-formatted data frame.
 
@@ -121,7 +124,7 @@ dem_score |>
   )
 ```
 
-### **LC4.5**
+#### LC4.5
 
 > Read in the life expectancy data stored at <https://moderndive.com/data/le_mess.csv> and convert it to a “tidy” data frame.
 
@@ -142,4 +145,4 @@ le_mess |>
 le_mess_tidy
 ```
 
-## 4.4 Tidyverse Package
+
