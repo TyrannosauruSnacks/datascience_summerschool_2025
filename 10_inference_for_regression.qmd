@@ -795,3 +795,104 @@ coffee_data |>
   * C. They serve to test the independence of residuals.
   
   * D. The indicate which observations should be excluded from the model.
+  
+## 10.5 Theory-based Inference for Multiple Linear Regression
+
+##### !error
+10.5.1
+
+ If we change the set of regressors used in a model, the *least-square[s]* estimates and *its[their]* standard errors will likely change as well. 
+ 
+### Fit and inspect diverse regression models.
+
+#### Model 1
+```{r}
+lm_multi_coff_1 <- 
+  lm(total_cup_points ~ aroma + flavor  + moisture_percentage,
+     data = coffee_data)
+
+coef(lm_multi_coff_1)
+sigma(lm_multi_coff_1)
+```
+
+#### Model 2
+```{r}
+lm_multi_coff_2 <- 
+  lm(total_cup_points ~ aroma + moisture_percentage,
+     data = coffee_data)
+
+coef(lm_multi_coff_2)
+sigma(lm_multi_coff_2)
+```
+
+```{r}
+lm_multi_coff_1 |> 
+  get_regression_table()
+```
+
+##### !clarity
+
+10.5.2
+For example, the formula for a 95% confidence interval for β1 is given by *b1±q⋅SEb1(s)* where the critical value q is determined by the level of confidence required, the sample size used (n), and the corresponding
+degrees.
+
+> Is that the right expression? I thought this should be $b_1 \pm q \cdot SE(b_1)$. Or what does the $s$ do?
+
+  * three partial slopes for aroma, flavor and moisture_content
+    (b1,b2, and b3), and
+
+  * three coefficients for the factor levels in the model 
+    *(b02, b03, and b04)*.
+
+> Ah okay, yeah the difference is $1$ and $01$, sure. Would it be wrong to
+> name them $b4, b5, b6$?
+
+### ANOVA Test
+```{r}
+anova(lm_multi_coff_2, lm_multi_coff_1)
+```
+
+```{r}
+# fit models with all columns as predictors
+lm_multi_coff_all <- 
+  lm(total_cup_points ~ 
+       aroma + flavor + moisture_percentage + continent_of_origin,
+     data = coffee_data)
+
+anova(lm_multi_coff_1, lm_multi_coff_all)
+```
+
+### Model Diagnostics
+```{r}
+# Get fitted values from the final model.
+fit_and_res_coff <- 
+  lm_multi_coff_all |> 
+    get_regression_points()
+
+# Make diagnostic plots.
+g1 <- 
+  fit_and_res_coff |> 
+  ggplot(aes(total_cup_points_hat, residual)) +
+  geom_point() +
+  geom_hline(yintercept = 0, col = "blue") +
+  labs(
+    x = "Fitted Values (Total Cup Points)",
+    y = "Residual"
+  )
+g2 <- 
+  fit_and_res_coff |> 
+  ggplot(aes(sample = residual)) +
+  geom_qq() +
+  geom_qq_line(col = "blue", linewidth = .5)
+
+library(patchwork)
+g1 + g2           
+```
+
+##### !error
+10.5.5
+(#fig:inference-for-regression-arrange, grid-arrange-plot-check)Residuals vs. fitted values plot and QQ-plot for the multiple regression model. 
+
+> Caption of plots is broken, ah yeah and therefore the reference is also
+> just '??'.
+

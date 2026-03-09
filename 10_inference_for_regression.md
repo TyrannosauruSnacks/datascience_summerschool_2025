@@ -1,6 +1,6 @@
 # Inference for Regression
 Max Hachemeister
-2026-03-07
+2026-03-09
 
 - [Prerequisites](#prerequisites)
   - [10.1](#101)
@@ -24,6 +24,12 @@ Max Hachemeister
   - [10.4 The Multiple Linear Regression
     Model](#104-the-multiple-linear-regression-model)
     - [Data exploration](#data-exploration)
+  - [10.5 Theory-based Inference for Multiple Linear
+    Regression](#105-theory-based-inference-for-multiple-linear-regression)
+    - [Fit and inspect diverse regression
+      models.](#fit-and-inspect-diverse-regression-models)
+    - [ANOVA Test](#anova-test)
+    - [Model Diagnostics](#model-diagnostics)
 
 # Prerequisites
 
@@ -230,13 +236,13 @@ spotify_for_anova |>
 ```
 
     # A tibble: 5 × 4
-      artists                      track_name                 popularity track_genre
-      <chr>                        <chr>                           <dbl> <chr>      
-    1 Dolly Parton                 Jolene                             73 country    
-    2 Juice Newton                 Angel Of The Morning               59 country    
-    3 Josh Turner                  Go Tell It On The Mountain          1 country    
-    4 Kacey Musgraves;Leon Bridges Present Without A Bow               0 country    
-    5 YUNGBLUD;Machine Gun Kelly   acting like that                    0 rock       
+      artists                                      track_name popularity track_genre
+      <chr>                                        <chr>           <dbl> <chr>      
+    1 Andrés Calamaro;Sebastian Yatra;Leiva;Ivan … Paloma              3 rock       
+    2 Kacey Musgraves                              Feliz Nav…          0 country    
+    3 Lady A                                       A Holly J…          0 country    
+    4 Megadeth                                     Holy Wars…          1 rock       
+    5 Volbeat                                      The Devil…          0 rock       
 
 ``` r
 # Check with Box plots
@@ -695,16 +701,16 @@ bootstrap_slope
     # A tibble: 1,000 × 2
        replicate  stat
            <int> <dbl>
-     1         1 0.342
-     2         2 0.343
-     3         3 0.408
-     4         4 0.361
-     5         5 0.363
-     6         6 0.376
-     7         7 0.403
-     8         8 0.391
-     9         9 0.357
-    10        10 0.383
+     1         1 0.354
+     2         2 0.408
+     3         3 0.354
+     4         4 0.308
+     5         5 0.405
+     6         6 0.380
+     7         7 0.364
+     8         8 0.380
+     9         9 0.401
+    10        10 0.352
     # ℹ 990 more rows
 
 #### Check distribution
@@ -728,7 +734,7 @@ bootstrap_slope_ci
     # A tibble: 1 × 2
       lower_ci upper_ci
          <dbl>    <dbl>
-    1    0.305    0.426
+    1    0.304    0.426
 
 #### Alternatively get confidence interval from standard error
 
@@ -761,7 +767,7 @@ se_ci
     # A tibble: 1 × 2
       lower_ci upper_ci
          <dbl>    <dbl>
-    1    0.311    0.431
+    1    0.309    0.433
 
 ### Hypothesis test
 
@@ -1099,3 +1105,160 @@ coffee_data |>
 - C. They serve to test the independence of residuals.
 
 - D. The indicate which observations should be excluded from the model.
+
+## 10.5 Theory-based Inference for Multiple Linear Regression
+
+##### !error
+
+10.5.1
+
+If we change the set of regressors used in a model, the
+*least-square\[s\]* estimates and *its\[their\]* standard errors will
+likely change as well.
+
+### Fit and inspect diverse regression models.
+
+#### Model 1
+
+``` r
+lm_multi_coff_1 <- 
+  lm(total_cup_points ~ aroma + flavor  + moisture_percentage,
+     data = coffee_data)
+
+coef(lm_multi_coff_1)
+```
+
+            (Intercept)               aroma              flavor moisture_percentage 
+            36.77809629          1.79987392          4.28523157         -0.01457307 
+
+``` r
+sigma(lm_multi_coff_1)
+```
+
+    [1] 0.5208255
+
+#### Model 2
+
+``` r
+lm_multi_coff_2 <- 
+  lm(total_cup_points ~ aroma + moisture_percentage,
+     data = coffee_data)
+
+coef(lm_multi_coff_2)
+```
+
+            (Intercept)               aroma moisture_percentage 
+            44.00980696          5.22694417         -0.06155424 
+
+``` r
+sigma(lm_multi_coff_2)
+```
+
+    [1] 0.8571982
+
+``` r
+lm_multi_coff_1 |> 
+  get_regression_table()
+```
+
+    # A tibble: 4 × 7
+      term                estimate std_error statistic p_value lower_ci upper_ci
+      <chr>                  <dbl>     <dbl>     <dbl>   <dbl>    <dbl>    <dbl>
+    1 intercept             36.8       1.10     33.6     0       34.6     38.9  
+    2 aroma                  1.8       0.223     8.09    0        1.36     2.24 
+    3 flavor                 4.28      0.229    18.7     0        3.83     4.74 
+    4 moisture_percentage   -0.015     0.029    -0.499   0.618   -0.072    0.043
+
+##### !clarity
+
+10.5.2 For example, the formula for a 95% confidence interval for β1 is
+given by *b1±q⋅SEb1(s)* where the critical value q is determined by the
+level of confidence required, the sample size used (n), and the
+corresponding degrees.
+
+> Is that the right expression? I thought this should be
+> $b_1 \pm q \cdot SE(b_1)$. Or what does the $s$ do?
+
+- three partial slopes for aroma, flavor and moisture_content (b1,b2,
+  and b3), and
+
+- three coefficients for the factor levels in the model *(b02, b03, and
+  b04)*.
+
+> Ah okay, yeah the difference is $1$ and $01$, sure. Would it be wrong
+> to name them $b4, b5, b6$?
+
+### ANOVA Test
+
+``` r
+anova(lm_multi_coff_2, lm_multi_coff_1)
+```
+
+    Analysis of Variance Table
+
+    Model 1: total_cup_points ~ aroma + moisture_percentage
+    Model 2: total_cup_points ~ aroma + flavor + moisture_percentage
+      Res.Df     RSS Df Sum of Sq     F    Pr(>F)    
+    1    204 149.897                                 
+    2    203  55.066  1    94.831 349.6 < 2.2e-16 ***
+    ---
+    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+``` r
+# fit models with all columns as predictors
+lm_multi_coff_all <- 
+  lm(total_cup_points ~ 
+       aroma + flavor + moisture_percentage + continent_of_origin,
+     data = coffee_data)
+
+anova(lm_multi_coff_1, lm_multi_coff_all)
+```
+
+    Analysis of Variance Table
+
+    Model 1: total_cup_points ~ aroma + flavor + moisture_percentage
+    Model 2: total_cup_points ~ aroma + flavor + moisture_percentage + continent_of_origin
+      Res.Df    RSS Df Sum of Sq      F   Pr(>F)   
+    1    203 55.066                                
+    2    200 51.346  3    3.7194 4.8292 0.002876 **
+    ---
+    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+### Model Diagnostics
+
+``` r
+# Get fitted values from the final model.
+fit_and_res_coff <- 
+  lm_multi_coff_all |> 
+    get_regression_points()
+
+# Make diagnostic plots.
+g1 <- 
+  fit_and_res_coff |> 
+  ggplot(aes(total_cup_points_hat, residual)) +
+  geom_point() +
+  geom_hline(yintercept = 0, col = "blue") +
+  labs(
+    x = "Fitted Values (Total Cup Points)",
+    y = "Residual"
+  )
+g2 <- 
+  fit_and_res_coff |> 
+  ggplot(aes(sample = residual)) +
+  geom_qq() +
+  geom_qq_line(col = "blue", linewidth = .5)
+
+library(patchwork)
+g1 + g2           
+```
+
+![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-42-1.png)
+
+##### !error
+
+10.5.5 (#fig:inference-for-regression-arrange,
+grid-arrange-plot-check)Residuals vs. fitted values plot and QQ-plot for
+the multiple regression model.
+
+> Caption of plots is broken, ah yeah and therefore the reference is
+> also just ‘??’.
