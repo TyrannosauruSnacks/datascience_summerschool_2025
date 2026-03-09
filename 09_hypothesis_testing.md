@@ -1,6 +1,6 @@
 # Hypothesis Testing
 Max Hachemeister
-2026-03-05
+2026-03-09
 
 - [Prerequisites](#prerequisites)
   - [9.6 Case Study: Are Action or Romance Movies Rated
@@ -123,7 +123,7 @@ null_distribution |>
     # A tibble: 1 × 1
       p_value
         <dbl>
-    1   0.069
+    1   0.064
 
 ``` r
 bootstrap_distribution <- 
@@ -140,7 +140,7 @@ percentile_ci
     # A tibble: 1 × 2
       lower_ci upper_ci
          <dbl>    <dbl>
-    1 -0.00226   0.0708
+    1 -0.00344   0.0720
 
 ``` r
 bootstrap_distribution |> 
@@ -343,6 +343,10 @@ movies_sample |>
 > In the tables about the sampling scenario some symbols have and some
 > have . Maybe homogenize that, if there are meant to mean the same.
 
+> EDIT Ah yeah, they are actually right, because $\bar x$ is the actual
+> mean of a sample, and $\hat \mu$ is the estimator for the population
+> based on $\bar x$
+
 ### `infer` workflow
 
 ``` r
@@ -365,7 +369,7 @@ null_distribution_movies |>
     # A tibble: 1 × 1
       p_value
         <dbl>
-    1  0.0028
+    1   0.002
 
 ``` r
 null_distribution_movies |> 

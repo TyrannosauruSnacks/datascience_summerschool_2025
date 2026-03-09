@@ -30,6 +30,13 @@ Max Hachemeister
       models.](#fit-and-inspect-diverse-regression-models)
     - [ANOVA Test](#anova-test)
     - [Model Diagnostics](#model-diagnostics)
+  - [10.6 Simulation-based Inference for Multiple Linear
+    Regression](#106-simulation-based-inference-for-multiple-linear-regression)
+    - [Getting the Observed Fitted
+      Model](#getting-the-observed-fitted-model)
+    - [Get the Bootstrap Distribution](#get-the-bootstrap-distribution)
+    - [Get Confidence Intervals](#get-confidence-intervals)
+    - [Hypothesis Testing](#hypothesis-testing)
 
 # Prerequisites
 
@@ -236,13 +243,13 @@ spotify_for_anova |>
 ```
 
     # A tibble: 5 × 4
-      artists                                      track_name popularity track_genre
-      <chr>                                        <chr>           <dbl> <chr>      
-    1 Andrés Calamaro;Sebastian Yatra;Leiva;Ivan … Paloma              3 rock       
-    2 Kacey Musgraves                              Feliz Nav…          0 country    
-    3 Lady A                                       A Holly J…          0 country    
-    4 Megadeth                                     Holy Wars…          1 rock       
-    5 Volbeat                                      The Devil…          0 rock       
+      artists                       track_name         popularity track_genre
+      <chr>                         <chr>                   <dbl> <chr>      
+    1 Bailey Zimmerman              Fall in Love                0 country    
+    2 Frankie Ballard               Sunshine & Whiskey          0 country    
+    3 RaeLynn                       The Apple                   0 country    
+    4 Morgan Evans;Kelsea Ballerini Dance with Me               0 country    
+    5 Bryan Adams                   Merry Christmas             0 rock       
 
 ``` r
 # Check with Box plots
@@ -701,16 +708,16 @@ bootstrap_slope
     # A tibble: 1,000 × 2
        replicate  stat
            <int> <dbl>
-     1         1 0.354
-     2         2 0.408
-     3         3 0.354
-     4         4 0.308
-     5         5 0.405
-     6         6 0.380
-     7         7 0.364
-     8         8 0.380
-     9         9 0.401
-    10        10 0.352
+     1         1 0.353
+     2         2 0.387
+     3         3 0.371
+     4         4 0.426
+     5         5 0.355
+     6         6 0.324
+     7         7 0.365
+     8         8 0.381
+     9         9 0.365
+    10        10 0.363
     # ℹ 990 more rows
 
 #### Check distribution
@@ -734,7 +741,7 @@ bootstrap_slope_ci
     # A tibble: 1 × 2
       lower_ci upper_ci
          <dbl>    <dbl>
-    1    0.304    0.426
+    1    0.304    0.429
 
 #### Alternatively get confidence interval from standard error
 
@@ -1116,6 +1123,8 @@ If we change the set of regressors used in a model, the
 *least-square\[s\]* estimates and *its\[their\]* standard errors will
 likely change as well.
 
+> Or why is ot plural here when in the context before it was not?
+
 ### Fit and inspect diverse regression models.
 
 #### Model 1
@@ -1262,3 +1271,266 @@ the multiple regression model.
 
 > Caption of plots is broken, ah yeah and therefore the reference is
 > also just ‘??’.
+
+#### LC10.19
+
+> Why is it essential to know that the estimators
+> ($b_0, b_1, \dots, b_p$) in multiple linear regression are unbiased?
+
+- A. It ensures that the variance of the estimators is always zero.
+
+- *B. It means that, on average, the estimators will equal the true*
+  *population parameters they estimate.*
+
+- C. It suggests that the estimators have a standard error of zero.
+
+- D. It implies that the regression model will always have a perfect
+  fit.
+
+#### LC10.20
+
+> Why do the least-squares estimates of coefficients change when
+> different sets of regressors are used in multiple linear regression?
+
+- A. Because the coefficients are recalculated each time, irrespective
+  of the regressors.
+
+- B. Because the residuals are always zero when regressors are changed.
+
+- *C. Because the value of each coefficient depends on the specific*
+  *combination of regressors included in the model.*
+
+- D. Because all models with different regressors will produce identical
+  estimates.
+
+#### LC10.21
+
+> How is a 95% confidence interval for a coefficient in multiple linear
+> regression constructed?
+
+- *A. By using the point estimate, the critical value from the*
+  *$t$-distribution, and the standard error of the coefficient.*
+
+- B. By taking the standard deviation of the coefficients only.
+
+- C. By resampling the data without replacement.
+
+- D. By calculating the mean of all coefficients.
+
+#### LC10.22
+
+> What does the ANOVA test for comparing two models in multiple linear
+> regression evaluate?
+
+- A. Whether all regressors in both models have the same coefficients.
+
+- *B. Whether the reduced model is adequate of if the full model is*
+  *needed.*
+
+- C. Whether the residuals of the two models follow a normal
+  distribution.
+
+- D. Whether the regression coefficients of one model are unbiased
+  estimators.
+
+## 10.6 Simulation-based Inference for Multiple Linear Regression
+
+#### !error
+
+> In this section heading “Inference” is spelled with and captial I,
+> while in the section 10.5 it’s spelled with a lowercase i.
+
+### Getting the Observed Fitted Model
+
+``` r
+observed_fit <- 
+  coffee_data |> 
+  specify(
+    total_cup_points ~ 
+      aroma + flavor + moisture_percentage + continent_of_origin
+  ) |> 
+  fit()
+
+observed_fit
+```
+
+    # A tibble: 7 × 2
+      term                             estimate
+      <chr>                               <dbl>
+    1 intercept                        37.3    
+    2 aroma                             1.73   
+    3 flavor                            4.32   
+    4 moisture_percentage              -0.00808
+    5 continent_of_originAsia          -0.393  
+    6 continent_of_originNorth America -0.273  
+    7 continent_of_originSouth America -0.478  
+
+### Get the Bootstrap Distribution
+
+``` r
+bootstrap_lm_coffee_all <- 
+  coffee_data |> 
+    specify(
+      total_cup_points ~ 
+        aroma + flavor + moisture_percentage + continent_of_origin
+    ) |> 
+    generate(reps = 1000, type = "bootstrap") |> 
+    fit()
+
+bootstrap_lm_coffee_all |> 
+visualize()
+```
+
+![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-44-1.png)
+
+### Get Confidence Intervals
+
+``` r
+confidence_intervals_lm_coffee_all <- 
+  bootstrap_lm_coffee_all |> 
+    get_confidence_interval(level = 0.95, type = "percentile",
+                            point_estimate = observed_fit)
+
+bootstrap_lm_coffee_all |> 
+  visualize() +
+  shade_ci(endpoints = confidence_intervals_lm_coffee_all)
+```
+
+![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-45-1.png)
+
+### Hypothesis Testing
+
+##### !error
+
+> In the code example for the null distribution the dataset
+> `coffee_quality` is used, while in the text above the `coffe_data` is
+> referenced.
+
+#### Generate Null Distribution
+
+``` r
+set.seed(22051989)
+
+null_distribution_lm_all <- 
+  coffee_data |> 
+  specify(
+    total_cup_points ~
+      continent_of_origin + aroma + flavor + moisture_percentage) |> 
+  hypothesize(null = "independence") |> 
+  generate(reps = 1000, type = "permute") |> 
+  fit()
+
+null_distribution_lm_all
+```
+
+    # A tibble: 7,000 × 3
+    # Groups:   replicate [1,000]
+       replicate term                             estimate
+           <int> <chr>                               <dbl>
+     1         1 intercept                         86.4   
+     2         1 continent_of_originAsia            0.518 
+     3         1 continent_of_originNorth America   0.616 
+     4         1 continent_of_originSouth America   0.894 
+     5         1 aroma                              0.0217
+     6         1 flavor                            -0.541 
+     7         1 moisture_percentage                0.0705
+     8         2 intercept                         85.3   
+     9         2 continent_of_originAsia           -0.441 
+    10         2 continent_of_originNorth America  -0.618 
+    # ℹ 6,990 more rows
+
+#### Check Observed Against Null Distribution
+
+``` r
+null_distribution_lm_all |> 
+  visualize() +
+  shade_p_value(obs_stat = observed_fit, direction = "two-sided")
+```
+
+![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-47-1.png)
+
+#### Get P-Values From Observed in Null Distribution
+
+``` r
+null_distribution_lm_all |> 
+  get_p_value(obs_stat = observed_fit, direction = "both")
+```
+
+    Warning: Please be cautious in reporting a p-value of 0. This result is an approximation
+    based on the number of `reps` chosen in the `generate()` step.
+    ℹ See `get_p_value()` (`?infer::get_p_value()`) for more information.
+    Please be cautious in reporting a p-value of 0. This result is an approximation
+    based on the number of `reps` chosen in the `generate()` step.
+    ℹ See `get_p_value()` (`?infer::get_p_value()`) for more information.
+
+    # A tibble: 7 × 2
+      term                             p_value
+      <chr>                              <dbl>
+    1 aroma                              0.012
+    2 continent_of_originAsia            0.34 
+    3 continent_of_originNorth America   0.534
+    4 continent_of_originSouth America   0.378
+    5 flavor                             0    
+    6 intercept                          0    
+    7 moisture_percentage                0.904
+
+#### LC10.23
+
+> Why might one prefer to use simulation-based methods
+> (e.g. bootstrapping) for inference in multiple linear regression?
+
+- A. Because simulation-based methods require larger sample sized than
+  theory-based methods.
+
+- B. Because simulation-based methods are always faster to compute than
+  theory-based methods.
+
+- C. Because simulation-based methods guarantee the correct model is
+  used.
+
+- *D. Because simulation-based methods do not rely on the assumptions*
+  *of normality or large sample sizes.*
+
+#### LC10.24
+
+> What is the purpose of constructing a boostrap distribution for the
+> partial slopes in multiple linear regression?
+
+- A. To replace the original data with random numbers.
+
+- *B. To approximate the sampling distribution of the partial slopes*
+  *by resampling with replacement.*
+
+- C. To calculate the exact values of the coefficients in the
+  population.
+
+- D. To test if the model assumptions are violated.
+
+#### LC10.25
+
+> If a 95% confidence interval for a partial slope in multiple linear
+> regression includes 0, what does this suggest about the variable?
+
+- *A. The variable does not have a statistically significant*
+  *relationship with the response variable.*
+
+- B. The variable is statistically significant.
+
+- C. The variable’s coefficient estimate is always negative.
+
+- D. The variable was removed from the model during bootstrapping.
+
+#### LC10.26
+
+> In hypothesis testing for the partial slopes using permutation tests,
+> what does it mean if an observed test statistic falls far to the right
+> of the null distribution?
+
+- A. The variable is likely to have no effect on the response.
+
+- B. The null hypothesis should be accepted.
+
+- *C. The variable is likely statistically significant, and we should*
+  *reject the null hypothesis.*
+
+- D. The observed data should be discarded.

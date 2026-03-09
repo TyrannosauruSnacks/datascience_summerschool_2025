@@ -288,6 +288,11 @@ movies_sample |>
 > some have \bar. Maybe homogenize that, if there are meant to mean the 
 > same.
 
+> EDIT
+> Ah yeah, they are actually right, because $\bar x$ is the actual mean
+> of a sample, and $\hat \mu$ is the estimator for the population based on
+> $\bar x$
+
 ### `infer` workflow
 
 ```{r}
