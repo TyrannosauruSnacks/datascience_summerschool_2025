@@ -1,6 +1,6 @@
 # Inference for Regression
 Max Hachemeister
-2026-03-09
+2026-03-14
 
 - [Prerequisites](#prerequisites)
   - [10.1](#101)
@@ -78,11 +78,13 @@ theme_set(theme_light())
 ### Tidy data
 
 ``` r
-UN_data_ch10 <- 
-  un_member_states_2024 |> 
-  select(country,
-         life_exp = life_expectancy_2022,
-         fert_rate = fertility_rate_2022) |> 
+UN_data_ch10 <-
+  un_member_states_2024 |>
+  select(
+    country,
+    life_exp = life_expectancy_2022,
+    fert_rate = fertility_rate_2022
+  ) |>
   na.omit()
 UN_data_ch10
 ```
@@ -105,7 +107,7 @@ UN_data_ch10
 ### Fit linear model
 
 ``` r
-linear_model <- 
+linear_model <-
   lm(fert_rate ~ life_exp, data = UN_data_ch10)
 coef(linear_model)
 ```
@@ -116,13 +118,10 @@ coef(linear_model)
 ### Plot data an model
 
 ``` r
-UN_data_ch10 |> 
+UN_data_ch10 |>
   ggplot(aes(life_exp, fert_rate)) +
   geom_point() +
-  geom_smooth(method = "lm",
-              formula = y ~ x,
-              se = FALSE,
-              linewidth = 0.5) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE, linewidth = 0.5) +
   labs(
     title = "Relationship of Fertility Rate and Life Expectancy",
     x = "Life Expectancy",
@@ -137,9 +136,9 @@ UN_data_ch10 |>
 #### Get Row ID for France
 
 ``` r
-UN_data_ch10 |> 
-  rowid_to_column() |> 
-  filter(country == "France") |> 
+UN_data_ch10 |>
+  rowid_to_column() |>
+  filter(country == "France") |>
   pull(rowid)
 ```
 
@@ -148,8 +147,8 @@ UN_data_ch10 |>
 #### Get Fit Data for France
 
 ``` r
-linear_model |> 
-  get_regression_points() |> 
+linear_model |>
+  get_regression_points() |>
   filter(ID == 57)
 ```
 
@@ -163,8 +162,8 @@ linear_model |>
 #### Get Summary
 
 ``` r
-old_faithful_2024 |> 
-  select(duration, waiting) |> 
+old_faithful_2024 |>
+  select(duration, waiting) |>
   tidy_summary()
 ```
 
@@ -177,7 +176,7 @@ old_faithful_2024 |>
 #### Visualize
 
 ``` r
-old_faithful_2024 |> 
+old_faithful_2024 |>
   ggplot(aes(duration, waiting)) +
   geom_point(alpha = 0.5)
 ```
@@ -187,7 +186,7 @@ old_faithful_2024 |>
 #### Fit Regression Model
 
 ``` r
-lm_faithful <- 
+lm_faithful <-
   lm(waiting ~ duration, data = old_faithful_2024)
 
 coef(lm_faithful)
@@ -215,7 +214,7 @@ Back to the `movies_sample`
 
 ``` r
 # Fit models and get infos
-lm_movies <- 
+lm_movies <-
   lm(rating ~ genre, data = movies_sample)
 
 get_regression_table(lm_movies)
@@ -233,27 +232,27 @@ Now the `spotify_by_genre` example
 
 ``` r
 # Selects columns of interest and get a sample
-spotify_for_anova <- 
-  spotify_by_genre |> 
-  filter(track_genre %in% c("country", "hip-hop", "rock")) |> 
+spotify_for_anova <-
+  spotify_by_genre |>
+  filter(track_genre %in% c("country", "hip-hop", "rock")) |>
   select(artists, track_name, popularity, track_genre)
 
-spotify_for_anova |> 
+spotify_for_anova |>
   slice_sample(n = 5)
 ```
 
     # A tibble: 5 × 4
-      artists                       track_name         popularity track_genre
-      <chr>                         <chr>                   <dbl> <chr>      
-    1 Bailey Zimmerman              Fall in Love                0 country    
-    2 Frankie Ballard               Sunshine & Whiskey          0 country    
-    3 RaeLynn                       The Apple                   0 country    
-    4 Morgan Evans;Kelsea Ballerini Dance with Me               0 country    
-    5 Bryan Adams                   Merry Christmas             0 rock       
+      artists          track_name                  popularity track_genre
+      <chr>            <chr>                            <dbl> <chr>      
+    1 The Strokes      The Adults Are Talking              79 rock       
+    2 Bailey Zimmerman Fall in Love                         1 country    
+    3 blink-182        Happy Holidays, You Bastard          0 rock       
+    4 Hunter Hayes     Wanted                               0 country    
+    5 The Smiths       Bigmouth Strikes Again               2 rock       
 
 ``` r
 # Check with Box plots
-spotify_for_anova |> 
+spotify_for_anova |>
   ggplot(aes(track_genre, popularity)) +
   geom_boxplot()
 ```
@@ -262,8 +261,8 @@ spotify_for_anova |>
 
 ``` r
 # Check the means for each
-spotify_for_anova |> 
-  group_by(track_genre) |> 
+spotify_for_anova |>
+  group_by(track_genre) |>
   summarize(mean_popularity = mean(popularity))
 ```
 
@@ -276,10 +275,10 @@ spotify_for_anova |>
 
 ``` r
 # Fit linear model
-lm_spotify <- 
+lm_spotify <-
   lm(popularity ~ track_genre, data = spotify_for_anova)
 
-lm_spotify |> 
+lm_spotify |>
   get_regression_table()
 ```
 
@@ -292,7 +291,7 @@ lm_spotify |>
 
 ``` r
 # Do an analysis of variance
-aov(popularity ~ track_genre, data = spotify_for_anova) |> 
+aov(popularity ~ track_genre, data = spotify_for_anova) |>
   anova()
 ```
 
@@ -396,7 +395,7 @@ Back to `old-faithful`
 ### There is a wrapper function for that
 
 ``` r
-lm_faithful |> 
+lm_faithful |>
   get_regression_table()
 ```
 
@@ -459,12 +458,12 @@ value. If we denote the residuals with the letter e we get:
 ``` r
 # Get residuals from model.
 
-fit_and_residuals <- 
+fit_and_residuals <-
   get_regression_points(lm_faithful)
 
 # Plot residuals over fitted values
 
-fit_and_residuals |> 
+fit_and_residuals |>
   ggplot(aes(waiting_hat, residual)) +
   geom_point() +
   geom_hline(yintercept = 0, col = "blue")
@@ -482,8 +481,8 @@ sequentially, one after the next.
 #### Check Normality
 
 ``` r
-# Plot residuals as histogram 
-fit_and_residuals |> 
+# Plot residuals as histogram
+fit_and_residuals |>
   ggplot(aes(residual, y = after_stat(density))) +
   geom_histogram() +
   geom_density()
@@ -495,7 +494,7 @@ fit_and_residuals |>
 
 ``` r
 # Plot residuals with qq plot
-fit_and_residuals |> 
+fit_and_residuals |>
   ggplot(aes(sample = residual)) +
   geom_qq() +
   geom_qq_line(color = "blue")
@@ -524,7 +523,7 @@ Also known as *homoskedasticity*.
 ``` r
 # Plot residuals against regressor variable
 
-fit_and_residuals |> 
+fit_and_residuals |>
   ggplot(aes(duration, residual)) +
   geom_point(alpha = 0.6) +
   geom_hline(yintercept = 0) +
@@ -553,21 +552,19 @@ fit_and_residuals |>
 
 ``` r
 # tidy data
-un_tidy <- 
-  un_member_states_2024 |> 
-    na.omit() |> 
-    select(country, 
-           fert_rate = fertility_rate_2022,
-           hdi = hdi_2022)
+un_tidy <-
+  un_member_states_2024 |>
+  na.omit() |>
+  select(country, fert_rate = fertility_rate_2022, hdi = hdi_2022)
 
 # Fit model
-lm_un <- 
+lm_un <-
   lm(fert_rate ~ hdi, data = un_tidy)
 
 # Get regression points.
-un_regpoints <- 
-  lm_un |> 
-    get_regression_points()
+un_regpoints <-
+  lm_un |>
+  get_regression_points()
 ```
 
 ##### Residual Analysis
@@ -577,8 +574,8 @@ un_regpoints <-
 ``` r
 # Check linearity by plotting residuals over estimates
 
-un_regpoints |> 
-  ggplot(aes(fert_rate_hat, residual)) + 
+un_regpoints |>
+  ggplot(aes(fert_rate_hat, residual)) +
   geom_point() +
   geom_hline(yintercept = 0, color = "blue")
 ```
@@ -599,7 +596,7 @@ of the exercise I assume the sample to be random.
 
 ``` r
 # Plot histogram of residuals
-un_regpoints |> 
+un_regpoints |>
   ggplot(aes(residual, after_stat(density))) +
   geom_histogram() +
   geom_density(color = "blue")
@@ -611,7 +608,7 @@ un_regpoints |>
 
 ``` r
 # Plot qq-plot
-un_regpoints |> 
+un_regpoints |>
   ggplot(aes(sample = residual)) +
   geom_qq() +
   geom_qq_line(color = "blue")
@@ -625,7 +622,7 @@ Yeah both look close to what I think a normal distribution looks like.
 
 ``` r
 # Plot residuals against regressor variable
-un_regpoints |> 
+un_regpoints |>
   ggplot(aes(hdi, residual)) +
   geom_point(alpha = 0.6) +
   geom_hline(yintercept = 0)
@@ -695,10 +692,10 @@ assumed.
 #### Get sampling distribution estimand by bootstrapping.
 
 ``` r
-bootstrap_slope <- 
-  old_faithful_2024 |> 
-  specify(formula = waiting ~ duration) |> 
-  generate(reps = 1000, type = "bootstrap") |> 
+bootstrap_slope <-
+  old_faithful_2024 |>
+  specify(formula = waiting ~ duration) |>
+  generate(reps = 1000, type = "bootstrap") |>
   calculate(stat = "slope")
 bootstrap_slope
 ```
@@ -708,22 +705,22 @@ bootstrap_slope
     # A tibble: 1,000 × 2
        replicate  stat
            <int> <dbl>
-     1         1 0.353
-     2         2 0.387
-     3         3 0.371
-     4         4 0.426
-     5         5 0.355
-     6         6 0.324
-     7         7 0.365
-     8         8 0.381
-     9         9 0.365
-    10        10 0.363
+     1         1 0.313
+     2         2 0.374
+     3         3 0.388
+     4         4 0.349
+     5         5 0.379
+     6         6 0.410
+     7         7 0.313
+     8         8 0.376
+     9         9 0.383
+    10        10 0.386
     # ℹ 990 more rows
 
 #### Check distribution
 
 ``` r
-bootstrap_slope |> 
+bootstrap_slope |>
   visualize()
 ```
 
@@ -732,24 +729,24 @@ bootstrap_slope |>
 #### Get confidence interval from percentiles
 
 ``` r
-bootstrap_slope_ci <- 
-  bootstrap_slope |> 
-    get_confidence_interval(type = "percentile", level = 0.95)
+bootstrap_slope_ci <-
+  bootstrap_slope |>
+  get_confidence_interval(type = "percentile", level = 0.95)
 bootstrap_slope_ci
 ```
 
     # A tibble: 1 × 2
       lower_ci upper_ci
          <dbl>    <dbl>
-    1    0.304    0.429
+    1    0.308    0.429
 
 #### Alternatively get confidence interval from standard error
 
 ``` r
 # Get observed value
-observed_slope <- 
-  old_faithful_2024 |> 
-  specify(waiting ~ duration) |> 
+observed_slope <-
+  old_faithful_2024 |>
+  specify(waiting ~ duration) |>
   calculate(stat = "slope")
 observed_slope
 ```
@@ -763,39 +760,41 @@ observed_slope
 
 ``` r
 # Calculate ci from that
-se_ci <- 
-  bootstrap_slope |> 
-  get_confidence_interval(level = 0.95, 
-                          type = "se", 
-                          point_estimate = observed_slope)
+se_ci <-
+  bootstrap_slope |>
+  get_confidence_interval(
+    level = 0.95,
+    type = "se",
+    point_estimate = observed_slope
+  )
 se_ci
 ```
 
     # A tibble: 1 × 2
       lower_ci upper_ci
          <dbl>    <dbl>
-    1    0.309    0.433
+    1    0.312    0.430
 
 ### Hypothesis test
 
 #### Generate null distribution
 
 ``` r
-null_distribution <- 
-  old_faithful_2024 |> 
-  specify(waiting ~ duration) |> 
-  hypothesize(null = "independence") |> 
+null_distribution <-
+  old_faithful_2024 |>
+  specify(waiting ~ duration) |>
+  hypothesize(null = "independence") |>
   generate(reps = 1000, type = "permute")
 ```
 
 #### Get test statistic
 
 ``` r
-null_distribution_slope <- 
-  null_distribution |> 
-    calculate(stat = "slope")
+null_distribution_slope <-
+  null_distribution |>
+  calculate(stat = "slope")
 
-null_distribution_slope |> 
+null_distribution_slope |>
   visualize()
 ```
 
@@ -805,13 +804,13 @@ null_distribution_slope |>
 
 ``` r
 # Get observed slope
-observed_slope <- 
-  old_faithful_2024 |> 
-  specify(waiting ~ duration) |> 
+observed_slope <-
+  old_faithful_2024 |>
+  specify(waiting ~ duration) |>
   calculate(stat = "slope")
 
 # Visualize null distribution and shade in the p-value of observed value
-null_distribution_slope |> 
+null_distribution_slope |>
   visualize() +
   shade_p_value(obs_stat = observed_slope, direction = "both")
 ```
@@ -820,7 +819,7 @@ null_distribution_slope |>
 
 ``` r
 # And get actual p-value
-null_distribution_slope |> 
+null_distribution_slope |>
   get_p_value(obs_stat = observed_slope, direction = "both")
 ```
 
@@ -846,20 +845,20 @@ null_distribution_slope |>
 
 ``` r
 # Generate bootstrap and get correlation
-bootstrap_corr <- 
-  old_faithful_2024 |> 
-  specify(waiting ~ duration) |> 
-  generate(reps = 1000, type = "bootstrap") |> 
+bootstrap_corr <-
+  old_faithful_2024 |>
+  specify(waiting ~ duration) |>
+  generate(reps = 1000, type = "bootstrap") |>
   calculate(stat = "correlation")
 
 # Get observed correlation
-obs_corr <- 
-  old_faithful_2024 |> 
-  specify(waiting ~ duration) |> 
+obs_corr <-
+  old_faithful_2024 |>
+  specify(waiting ~ duration) |>
   calculate(stat = "correlation")
 
 # Visually check for normality
-bootstrap_corr |> 
+bootstrap_corr |>
   visualize()
 ```
 
@@ -869,22 +868,19 @@ bootstrap_corr |>
 ## Looks normal
 
 # Get confidence interval from distribution percentiles
-bootstrap_corr_ci_perc <- 
-  bootstrap_corr |> 
+bootstrap_corr_ci_perc <-
+  bootstrap_corr |>
   get_confidence_interval(level = 0.95, type = "percentile")
 
 # Get confidence interval from standard error
-bootstrap_corr_ci_se <- 
-  bootstrap_corr |> 
-  get_confidence_interval(level = 0.95, 
-                          type = "se", 
-                          point_estimate = obs_corr)
+bootstrap_corr_ci_se <-
+  bootstrap_corr |>
+  get_confidence_interval(level = 0.95, type = "se", point_estimate = obs_corr)
 # Visualize
-bootstrap_corr |> 
+bootstrap_corr |>
   visualize() +
   shade_confidence_interval(endpoints = bootstrap_corr_ci_perc) +
-  shade_confidence_interval(endpoints = bootstrap_corr_ci_se, 
-                            color = "khaki")
+  shade_confidence_interval(endpoints = bootstrap_corr_ci_se, color = "khaki")
 ```
 
 ![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-31-2.png)
@@ -898,23 +894,23 @@ time between eruptions, on average.
 ###### Generate null distribution and get observed value
 
 ``` r
-null_distribution_corr <- 
-  old_faithful_2024 |> 
-  specify(formula = waiting ~ duration) |> 
-  hypothesize(null = "independence") |> 
-  generate(reps = 1000, type = "permute") |> 
+null_distribution_corr <-
+  old_faithful_2024 |>
+  specify(formula = waiting ~ duration) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   calculate(stat = "correlation")
 
-obs_corr <- 
-  old_faithful_2024 |> 
-  specify(formula = waiting ~ duration) |> 
+obs_corr <-
+  old_faithful_2024 |>
+  specify(formula = waiting ~ duration) |>
   calculate(stat = "correlation")
 ```
 
 ###### Visualize and get p value
 
 ``` r
-null_distribution_corr |> 
+null_distribution_corr |>
   visualize() +
   shade_p_value(obs_stat = obs_corr, direction = "both")
 ```
@@ -922,7 +918,7 @@ null_distribution_corr |>
 ![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-33-1.png)
 
 ``` r
-null_distribution_corr |> 
+null_distribution_corr |>
   get_p_value(obs_stat = obs_corr, direction = "both")
 ```
 
@@ -1001,14 +997,15 @@ time between and the duration of eruptions to be correlated.
 #### Tidy Data
 
 ``` r
-coffee_data <- 
-  coffee_quality |> 
+coffee_data <-
+  coffee_quality |>
   select(
     aroma,
     flavor,
     moisture_percentage,
     continent_of_origin,
-    total_cup_points) |> 
+    total_cup_points
+  ) |>
   mutate(continent_of_origin = factor(continent_of_origin))
 coffee_data
 ```
@@ -1031,7 +1028,7 @@ coffee_data
 #### Get Tidy Summary
 
 ``` r
-coffee_data |> 
+coffee_data |>
   tidy_summary()
 ```
 
@@ -1050,7 +1047,7 @@ coffee_data |>
 #### Create a scatterplot matrix
 
 ``` r
-coffee_data |> 
+coffee_data |>
   GGally::ggpairs()
 ```
 
@@ -1130,9 +1127,11 @@ likely change as well.
 #### Model 1
 
 ``` r
-lm_multi_coff_1 <- 
-  lm(total_cup_points ~ aroma + flavor  + moisture_percentage,
-     data = coffee_data)
+lm_multi_coff_1 <-
+  lm(
+    total_cup_points ~ aroma + flavor + moisture_percentage,
+    data = coffee_data
+  )
 
 coef(lm_multi_coff_1)
 ```
@@ -1149,9 +1148,8 @@ sigma(lm_multi_coff_1)
 #### Model 2
 
 ``` r
-lm_multi_coff_2 <- 
-  lm(total_cup_points ~ aroma + moisture_percentage,
-     data = coffee_data)
+lm_multi_coff_2 <-
+  lm(total_cup_points ~ aroma + moisture_percentage, data = coffee_data)
 
 coef(lm_multi_coff_2)
 ```
@@ -1166,7 +1164,7 @@ sigma(lm_multi_coff_2)
     [1] 0.8571982
 
 ``` r
-lm_multi_coff_1 |> 
+lm_multi_coff_1 |>
   get_regression_table()
 ```
 
@@ -1215,10 +1213,12 @@ anova(lm_multi_coff_2, lm_multi_coff_1)
 
 ``` r
 # fit models with all columns as predictors
-lm_multi_coff_all <- 
-  lm(total_cup_points ~ 
-       aroma + flavor + moisture_percentage + continent_of_origin,
-     data = coffee_data)
+lm_multi_coff_all <-
+  lm(
+    total_cup_points ~
+      aroma + flavor + moisture_percentage + continent_of_origin,
+    data = coffee_data
+  )
 
 anova(lm_multi_coff_1, lm_multi_coff_all)
 ```
@@ -1237,13 +1237,13 @@ anova(lm_multi_coff_1, lm_multi_coff_all)
 
 ``` r
 # Get fitted values from the final model.
-fit_and_res_coff <- 
-  lm_multi_coff_all |> 
-    get_regression_points()
+fit_and_res_coff <-
+  lm_multi_coff_all |>
+  get_regression_points()
 
 # Make diagnostic plots.
-g1 <- 
-  fit_and_res_coff |> 
+g1 <-
+  fit_and_res_coff |>
   ggplot(aes(total_cup_points_hat, residual)) +
   geom_point() +
   geom_hline(yintercept = 0, col = "blue") +
@@ -1251,14 +1251,14 @@ g1 <-
     x = "Fitted Values (Total Cup Points)",
     y = "Residual"
   )
-g2 <- 
-  fit_and_res_coff |> 
+g2 <-
+  fit_and_res_coff |>
   ggplot(aes(sample = residual)) +
   geom_qq() +
   geom_qq_line(col = "blue", linewidth = .5)
 
 library(patchwork)
-g1 + g2           
+g1 + g2
 ```
 
 ![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-42-1.png)
@@ -1343,12 +1343,12 @@ the multiple regression model.
 ### Getting the Observed Fitted Model
 
 ``` r
-observed_fit <- 
-  coffee_data |> 
+observed_fit <-
+  coffee_data |>
   specify(
-    total_cup_points ~ 
+    total_cup_points ~
       aroma + flavor + moisture_percentage + continent_of_origin
-  ) |> 
+  ) |>
   fit()
 
 observed_fit
@@ -1368,17 +1368,17 @@ observed_fit
 ### Get the Bootstrap Distribution
 
 ``` r
-bootstrap_lm_coffee_all <- 
-  coffee_data |> 
-    specify(
-      total_cup_points ~ 
-        aroma + flavor + moisture_percentage + continent_of_origin
-    ) |> 
-    generate(reps = 1000, type = "bootstrap") |> 
-    fit()
+bootstrap_lm_coffee_all <-
+  coffee_data |>
+  specify(
+    total_cup_points ~
+      aroma + flavor + moisture_percentage + continent_of_origin
+  ) |>
+  generate(reps = 1000, type = "bootstrap") |>
+  fit()
 
-bootstrap_lm_coffee_all |> 
-visualize()
+bootstrap_lm_coffee_all |>
+  visualize()
 ```
 
 ![](10_inference_for_regression_files/figure-commonmark/unnamed-chunk-44-1.png)
@@ -1386,12 +1386,15 @@ visualize()
 ### Get Confidence Intervals
 
 ``` r
-confidence_intervals_lm_coffee_all <- 
-  bootstrap_lm_coffee_all |> 
-    get_confidence_interval(level = 0.95, type = "percentile",
-                            point_estimate = observed_fit)
+confidence_intervals_lm_coffee_all <-
+  bootstrap_lm_coffee_all |>
+  get_confidence_interval(
+    level = 0.95,
+    type = "percentile",
+    point_estimate = observed_fit
+  )
 
-bootstrap_lm_coffee_all |> 
+bootstrap_lm_coffee_all |>
   visualize() +
   shade_ci(endpoints = confidence_intervals_lm_coffee_all)
 ```
@@ -1411,13 +1414,14 @@ bootstrap_lm_coffee_all |>
 ``` r
 set.seed(22051989)
 
-null_distribution_lm_all <- 
-  coffee_data |> 
+null_distribution_lm_all <-
+  coffee_data |>
   specify(
     total_cup_points ~
-      continent_of_origin + aroma + flavor + moisture_percentage) |> 
-  hypothesize(null = "independence") |> 
-  generate(reps = 1000, type = "permute") |> 
+      continent_of_origin + aroma + flavor + moisture_percentage
+  ) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   fit()
 
 null_distribution_lm_all
@@ -1442,7 +1446,7 @@ null_distribution_lm_all
 #### Check Observed Against Null Distribution
 
 ``` r
-null_distribution_lm_all |> 
+null_distribution_lm_all |>
   visualize() +
   shade_p_value(obs_stat = observed_fit, direction = "two-sided")
 ```
@@ -1452,7 +1456,7 @@ null_distribution_lm_all |>
 #### Get P-Values From Observed in Null Distribution
 
 ``` r
-null_distribution_lm_all |> 
+null_distribution_lm_all |>
   get_p_value(obs_stat = observed_fit, direction = "both")
 ```
 
@@ -1534,3 +1538,6 @@ null_distribution_lm_all |>
   *reject the null hypothesis.*
 
 - D. The observed data should be discarded.
+
+Test and some more of that stuff, that I might like in the midst of
+things. Ans some more line.
