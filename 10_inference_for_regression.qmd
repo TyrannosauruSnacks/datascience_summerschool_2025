@@ -1110,10 +1110,7 @@ null_distribution_lm_all |>
   
   * B. The null hypothesis should be accepted.
   
-  * *C. The variable is likely statistically significant, and we should*
-       *reject the null hypothesis.*
+  * *C. The variable is likely statistically significant, and we should reject the null hypothesis.*
        
-  * D. The observed data should be discarded.
+  * D. The observed data should be discarded
 
-  Test and some more of that stuff, that I might like in the midst of things.
-  Ans some more line.

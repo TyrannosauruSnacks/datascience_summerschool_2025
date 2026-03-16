@@ -1,0 +1,44 @@
+---
+title:       "Tell Your Story with Data"
+subtitle:    "My Personal Notes"
+author:      "Max Hachemeister"
+date:        last-modified
+date-format: iso
+format:      gfm
+toc:         true
+---
+
+
+# Prerequisites
+```{r}
+#| label: setup
+#| results: false
+library(tidyverse)
+library(moderndive)
+library(fivethirtyeight)
+library(infer)
+theme_set(theme_light())
+```
+
+# Case Study: Seattle House Prices
+We will create a multiple regression model for inference.
+
+## Exploratory Data Analysis
+EDA has three main steps:
+
+  * Looking a the raw data values.
+  * Computing summary statistics.
+  * Creating data visualizations.
+
+We start with a look a the raw data:
+```{r}
+glimpse(house_prices)
+```
+
+The data set has `{r} format(nrow(house_prices), big.mark = ',')` entries and `{r} ncol(house_prices)` varibales, one of which is an ID column that is not really informational.
+
+Let's look at all the numeric varibles:
+```{r}
+house_prices |>
+  tidy_summary(where(is.numeric))
+```
